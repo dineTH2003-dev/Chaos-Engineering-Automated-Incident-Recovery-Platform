@@ -20,6 +20,12 @@ http_requests_total = Counter(
     labelnames=["method", "route", "status_code"],
 )
 
+http_requests_in_progress = Gauge(
+    "http_requests_in_progress",
+    "Current count of HTTP requests being processed",
+    labelnames=["method", "route"],
+)
+
 http_request_duration_seconds = Histogram(
     "http_request_duration_seconds",
     "HTTP request latency in seconds",
@@ -62,6 +68,10 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
         status_code = 500
         exception_raised = False
 
+        # Pre-resolve route path for active requests tracking
+        route_path = self._resolve_route_path(request, 0)
+        http_requests_in_progress.labels(method=method, route=route_path).inc()
+
         try:
             response = await call_next(request)
             status_code = response.status_code
@@ -73,18 +83,20 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
             application_errors_total.labels(error_type=error_type).inc()
             raise exc
         finally:
+            http_requests_in_progress.labels(method=method, route=route_path).dec()
             duration = max(time.perf_counter() - start_time, 0.0)
-            route_path = self._resolve_route_path(request, status_code)
+            # Re-resolve with actual status code if it was not found
+            resolved_route = self._resolve_route_path(request, status_code)
 
             http_requests_total.labels(
                 method=method,
-                route=route_path,
+                route=resolved_route,
                 status_code=str(status_code),
             ).inc()
 
             http_request_duration_seconds.labels(
                 method=method,
-                route=route_path,
+                route=resolved_route,
             ).observe(duration)
 
             if status_code >= 500 and not exception_raised:

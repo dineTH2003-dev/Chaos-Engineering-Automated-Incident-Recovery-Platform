@@ -1,0 +1,99 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: resiliencelab-alerts
+  namespace: resiliencelab
+  labels:
+    app: resiliencelab
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: resiliencelab.alerts
+      rules:
+        # 1. Application Unavailable / Service Down
+        - alert: ApiReplicasUnavailable
+          expr: kube_deployment_status_replicas_available{namespace="resiliencelab", deployment="api"} < 2
+          for: 1m
+          labels:
+            severity: critical
+            service: resiliencelab-api
+          annotations:
+            summary: "ResilienceLab API deployment has degraded replica count"
+            description: "Deployment api has {{ $value }} available replicas (expected 2) for over 1 minute."
+
+        # 2. High HTTP Error Rate
+        - alert: HighHttpErrorRate
+          expr: (sum(rate(http_requests_total{namespace="resiliencelab", status_code=~"5.."}[2m])) / sum(rate(http_requests_total{namespace="resiliencelab"}[2m]))) * 100 > 5
+          for: 1m
+          labels:
+            severity: critical
+            service: resiliencelab-api
+          annotations:
+            summary: "ResilienceLab API 5xx HTTP error rate exceeds 5%"
+            description: "5xx HTTP error rate is {{ $value | printf \"%.2f\" }}% over the last 2 minutes."
+
+        # 3. High Request Latency (p95 > 500ms)
+        - alert: HighRequestLatency
+          expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace="resiliencelab"}[2m])) by (le)) > 0.5
+          for: 1m
+          labels:
+            severity: warning
+            service: resiliencelab-api
+          annotations:
+            summary: "ResilienceLab API p95 latency exceeds 500ms"
+            description: "p95 latency is {{ $value | printf \"%.3f\" }}s over the last 2 minutes."
+
+        # 4. Pod CrashLooping
+        - alert: PodCrashLooping
+          expr: rate(kube_pod_container_status_restarts_total{namespace="resiliencelab"}[5m]) * 300 > 2
+          for: 1m
+          labels:
+            severity: critical
+            service: resiliencelab-workloads
+          annotations:
+            summary: "Pod in resiliencelab is restarting frequently"
+            description: "Pod {{ $labels.pod }} restarted more than 2 times in 5 minutes."
+
+        # 5. Worker Processing Failures
+        - alert: WorkerProcessingFailures
+          expr: increase(orders_processing_errors_total[2m]) > 0
+          for: 30s
+          labels:
+            severity: critical
+            service: resiliencelab-worker
+          annotations:
+            summary: "Worker service encountered order processing errors"
+            description: "Worker registered {{ $value }} processing errors in the last 2 minutes."
+
+        # 6. Database Connection Failure
+        - alert: DatabaseConnectionFailures
+          expr: increase(database_connection_errors_total[1m]) > 0
+          for: 15s
+          labels:
+            severity: critical
+            service: postgres
+          annotations:
+            summary: "Database connection errors detected"
+            description: "API/Worker recorded {{ $value }} database connection errors in the last minute."
+
+        # 7. High CPU Utilization (> 85% of request/limit)
+        - alert: HighCpuUtilization
+          expr: sum(rate(container_cpu_usage_seconds_total{namespace="resiliencelab", container!=""}[2m])) by (pod, container) / sum(kube_pod_container_resource_limits{namespace="resiliencelab", resource="cpu"}) by (pod, container) * 100 > 85
+          for: 2m
+          labels:
+            severity: warning
+            service: resiliencelab-workloads
+          annotations:
+            summary: "Container CPU utilization exceeds 85%"
+            description: "Pod {{ $labels.pod }} container {{ $labels.container }} CPU usage is at {{ $value | printf \"%.1f\" }}% of limit."
+
+        # 8. High Memory Utilization (> 85% of limit)
+        - alert: HighMemoryUtilization
+          expr: sum(container_memory_working_set_bytes{namespace="resiliencelab", container!=""}) by (pod, container) / sum(kube_pod_container_resource_limits{namespace="resiliencelab", resource="memory"}) by (pod, container) * 100 > 85
+          for: 2m
+          labels:
+            severity: warning
+            service: resiliencelab-workloads
+          annotations:
+            summary: "Container memory utilization exceeds 85%"
+            description: "Pod {{ $labels.pod }} container {{ $labels.container }} memory usage is at {{ $value | printf \"%.1f\" }}% of limit."

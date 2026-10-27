@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-service
+  namespace: resiliencelab
+  labels:
+    app: resiliencelab-worker
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8001
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    app: resiliencelab-worker

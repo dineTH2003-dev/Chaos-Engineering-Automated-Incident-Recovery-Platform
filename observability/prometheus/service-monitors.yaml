@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: resiliencelab-api
+  namespace: resiliencelab
+  labels:
+    app: resiliencelab-api
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: resiliencelab-api
+  namespaceSelector:
+    matchNames:
+      - resiliencelab
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: resiliencelab-worker
+  namespace: resiliencelab
+  labels:
+    app: resiliencelab-worker
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: resiliencelab-worker
+  namespaceSelector:
+    matchNames:
+      - resiliencelab
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s

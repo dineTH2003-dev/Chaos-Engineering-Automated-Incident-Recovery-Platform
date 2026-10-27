@@ -128,6 +128,31 @@ load-test-baseline: ## Run k6 baseline load test
 load-test-stress: ## Run k6 stress load test
 	$(K6_BIN) run load-testing/stress.js
 
+# ─── Observability ─────────────────────────────────────────────
+
+obs-status: ## Check status of observability stack
+	@echo "=== Monitoring Pods ==="
+	@kubectl get pods -n monitoring
+	@echo "\n=== ServiceMonitors ==="
+	@kubectl get servicemonitors -A
+	@echo "\n=== PrometheusRules ==="
+	@kubectl get prometheusrules -A
+
+obs-port-forward-grafana: ## Port-forward Grafana to localhost:3000 (admin / prom-operator)
+	kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80
+
+obs-port-forward-prometheus: ## Port-forward Prometheus to localhost:9090
+	kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
+
+obs-port-forward-alertmanager: ## Port-forward Alertmanager to localhost:9093
+	kubectl port-forward -n monitoring svc/kube-prometheus-stack-alertmanager 9093:9093
+
+obs-port-forward-webhook: ## Port-forward Webhook Receiver to localhost:5001
+	kubectl port-forward -n $(NAMESPACE) svc/webhook-receiver 5001:5001
+
+obs-incidents: ## View recorded incidents from webhook receiver
+	@kubectl exec -n $(NAMESPACE) deploy/webhook-receiver -- cat /reports/incidents/incidents.log 2>/dev/null || cat reports/incidents/incidents.log
+
 # ─── Clean ─────────────────────────────────────────────────────
 
 clean: ## Full cleanup — stop cluster, remove compose volumes
