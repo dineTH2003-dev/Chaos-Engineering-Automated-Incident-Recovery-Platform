@@ -138,11 +138,13 @@ obs-status: ## Check status of observability stack
 	@echo "\n=== PrometheusRules ==="
 	@kubectl get prometheusrules -A
 
-obs-port-forward-grafana: ## Port-forward Grafana to localhost:3000 (admin / prom-operator)
-	kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80
+obs-port-forward-grafana: ## Port-forward Grafana to localhost:3001 (admin / prom-operator)
+	@echo "Opening Grafana at http://localhost:3001 (Credentials: admin / prom-operator)..."
+	kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3001:80
 
-obs-port-forward-prometheus: ## Port-forward Prometheus to localhost:9090
-	kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
+obs-port-forward-prometheus: ## Port-forward Prometheus to localhost:9091
+	@echo "Opening Prometheus at http://localhost:9091..."
+	kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9091:9090
 
 obs-port-forward-alertmanager: ## Port-forward Alertmanager to localhost:9093
 	kubectl port-forward -n monitoring svc/kube-prometheus-stack-alertmanager 9093:9093

@@ -183,11 +183,11 @@ make status
 ```bash
 # Grafana (Credentials: admin / prom-operator)
 make obs-port-forward-grafana
-# Open http://localhost:3000
+# Open http://localhost:3001
 
 # Prometheus UI
 make obs-port-forward-prometheus
-# Open http://localhost:9090
+# Open http://localhost:9091
 
 # Alertmanager UI
 make obs-port-forward-alertmanager
