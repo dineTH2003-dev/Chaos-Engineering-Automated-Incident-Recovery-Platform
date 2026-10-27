@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+*.egg
+
+# Environment
+.env
+*.env.local
+
+# Kubernetes secrets (NEVER commit real secrets)
+kubernetes/secrets.yaml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.tar
+
+# Reports (generated, but we version control templates)
+# Uncomment if you don't want to track generated reports:
+# reports/experiments/*.json
+# reports/incidents/*.md
+
+# Test artifacts
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Minikube
+.minikube/

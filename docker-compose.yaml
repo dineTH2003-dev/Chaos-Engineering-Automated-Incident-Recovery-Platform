@@ -1,0 +1,58 @@
+# ResilienceLab — Local Development with Docker Compose
+# Usage: docker compose up -d
+# This is for rapid local iteration WITHOUT Kubernetes.
+# For K8s deployment, use: make deploy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: resiliencelab-postgres
+    environment:
+      POSTGRES_DB: resiliencelab
+      POSTGRES_USER: resiliencelab
+      POSTGRES_PASSWORD: resiliencelab
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./application/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U resiliencelab -d resiliencelab"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: ./application/api
+      dockerfile: Dockerfile
+    container_name: resiliencelab-api
+    ports:
+      - "8000:8000"
+    environment:
+      RESILIENCELAB_DATABASE_URL: "postgresql+psycopg://resiliencelab:resiliencelab@postgres:5432/resiliencelab"
+      RESILIENCELAB_LOG_LEVEL: "DEBUG"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./application/worker
+      dockerfile: Dockerfile
+    container_name: resiliencelab-worker
+    ports:
+      - "8001:8001"
+    environment:
+      RESILIENCELAB_WORKER_DATABASE_URL: "postgresql+psycopg://resiliencelab:resiliencelab@postgres:5432/resiliencelab"
+      RESILIENCELAB_WORKER_LOG_LEVEL: "DEBUG"
+      RESILIENCELAB_WORKER_POLL_INTERVAL_SECONDS: "5"
+      RESILIENCELAB_WORKER_PROCESSING_DELAY_SECONDS: "2"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

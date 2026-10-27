@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resiliencelab-config
+  namespace: resiliencelab
+  labels:
+    app: resiliencelab
+data:
+  # Database configuration
+  RESILIENCELAB_DATABASE_URL: "postgresql+psycopg://resiliencelab:resiliencelab@postgres:5432/resiliencelab"
+
+  # API configuration
+  RESILIENCELAB_APP_NAME: "resiliencelab-api"
+  RESILIENCELAB_LOG_LEVEL: "INFO"
+  RESILIENCELAB_DB_POOL_SIZE: "5"
+  RESILIENCELAB_DB_MAX_OVERFLOW: "10"
+  RESILIENCELAB_DB_POOL_TIMEOUT: "30"
+  RESILIENCELAB_DB_POOL_RECYCLE: "1800"
+
+  # Worker configuration
+  RESILIENCELAB_WORKER_DATABASE_URL: "postgresql+psycopg://resiliencelab:resiliencelab@postgres:5432/resiliencelab"
+  RESILIENCELAB_WORKER_POLL_INTERVAL_SECONDS: "5"
+  RESILIENCELAB_WORKER_BATCH_SIZE: "10"
+  RESILIENCELAB_WORKER_PROCESSING_DELAY_SECONDS: "2"
+  RESILIENCELAB_WORKER_LOG_LEVEL: "INFO"
+  RESILIENCELAB_WORKER_QUEUE_BACKEND: "postgres"
+
+  # PostgreSQL configuration
+  POSTGRES_DB: "resiliencelab"
+  POSTGRES_USER: "resiliencelab"
