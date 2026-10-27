@@ -1,0 +1,9 @@
+apiVersion: v2
+name: resiliencelab
+description: Production-grade Helm chart for ResilienceLab Chaos Engineering & Automated Incident Recovery Platform
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: ResilienceLab SRE Team
+    email: sre@resiliencelab.internal

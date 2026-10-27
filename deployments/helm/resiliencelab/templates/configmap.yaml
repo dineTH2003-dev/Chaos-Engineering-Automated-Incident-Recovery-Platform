@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resiliencelab-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: resiliencelab
+    {{- include "resiliencelab.labels" . | nindent 4 }}
+data:
+  RESILIENCELAB_DATABASE_URL: "postgresql+psycopg://{{ .Values.config.postgresUser }}:{{ .Values.config.postgresUser }}@postgres:5432/{{ .Values.config.postgresDb }}"
+  RESILIENCELAB_APP_NAME: {{ .Values.config.appName | quote }}
+  RESILIENCELAB_LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  RESILIENCELAB_DB_POOL_SIZE: {{ .Values.config.dbPoolSize | quote }}
+  RESILIENCELAB_DB_MAX_OVERFLOW: {{ .Values.config.dbMaxOverflow | quote }}
+  RESILIENCELAB_DB_POOL_TIMEOUT: {{ .Values.config.dbPoolTimeout | quote }}
+  RESILIENCELAB_DB_POOL_RECYCLE: {{ .Values.config.dbPoolRecycle | quote }}
+
+  RESILIENCELAB_WORKER_DATABASE_URL: "postgresql+psycopg://{{ .Values.config.postgresUser }}:{{ .Values.config.postgresUser }}@postgres:5432/{{ .Values.config.postgresDb }}"
+  RESILIENCELAB_WORKER_POLL_INTERVAL_SECONDS: {{ .Values.config.workerPollIntervalSeconds | quote }}
+  RESILIENCELAB_WORKER_BATCH_SIZE: {{ .Values.config.workerBatchSize | quote }}
+  RESILIENCELAB_WORKER_PROCESSING_DELAY_SECONDS: {{ .Values.config.workerProcessingDelaySeconds | quote }}
+  RESILIENCELAB_WORKER_LOG_LEVEL: {{ .Values.config.workerLogLevel | quote }}
+  RESILIENCELAB_WORKER_QUEUE_BACKEND: {{ .Values.config.workerQueueBackend | quote }}
+
+  POSTGRES_DB: {{ .Values.config.postgresDb | quote }}
+  POSTGRES_USER: {{ .Values.config.postgresUser | quote }}

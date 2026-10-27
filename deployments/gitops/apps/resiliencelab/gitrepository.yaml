@@ -1,0 +1,18 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: resiliencelab
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/part-of: resiliencelab
+spec:
+  interval: 1m
+  url: https://github.com/dineTH2003-dev/Chaos-Engineering-Automated-Incident-Recovery-Platform.git
+  ref:
+    branch: main
+  timeout: 60s
+  ignore: |
+    /docs/
+    /reports/
+    README.md
+    .github/

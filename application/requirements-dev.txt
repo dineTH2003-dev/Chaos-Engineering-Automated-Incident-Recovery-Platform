@@ -1,3 +1,4 @@
 # ResilienceLab Development and Testing Dependencies
 pytest==9.1.1
 httpx==0.28.1
+flake8==7.4.1

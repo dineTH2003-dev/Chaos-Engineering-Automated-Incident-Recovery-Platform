@@ -1,0 +1,154 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-syntax:
+    name: Code Quality & Syntax Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Linting Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8==7.4.1 pyyaml==6.0.3
+
+      - name: Run Flake8 Linter
+        run: |
+          flake8 application/ automation/
+
+      - name: Validate YAML Manifests Syntax
+        run: |
+          python3 -c '
+          import os, yaml
+          for root, _, files in os.walk("."):
+              if any(skip in root for skip in [".git", ".venv", "__pycache__"]): continue
+              for f in files:
+                  if f.endswith((".yaml", ".yml")):
+                      p = os.path.join(root, f)
+                      try:
+                          with open(p) as fp:
+                              list(yaml.safe_load_all(fp))
+                      except Exception as e:
+                          print(f"Invalid YAML in {p}: {e}")
+                          exit(1)
+          print("All YAML manifests successfully validated.")
+          '
+
+  test-unit-and-integration:
+    name: Automated Unit & Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r application/requirements-dev.txt \
+                      -r application/api/requirements.txt \
+                      -r application/worker/requirements.txt \
+                      pydantic-settings pyyaml psycopg psycopg-binary starlette
+
+      - name: Run Application API Tests
+        run: |
+          PYTHONPATH=application/api pytest application/api/tests/ -v
+
+      - name: Run Phase 4 Incident Engine Tests
+        run: |
+          pytest automation/incident/tests/ -v
+
+  manifest-and-helm-validation:
+    name: Kubernetes & Helm Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.3
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.31.0
+
+      - name: Dry-run Validate Raw Kubernetes Manifests
+        run: |
+          kubectl apply --dry-run=client -f kubernetes/
+
+      - name: Validate Helm Chart
+        run: |
+          if [ -d "deployments/helm/resiliencelab" ]; then
+            helm lint deployments/helm/resiliencelab
+            helm template resiliencelab deployments/helm/resiliencelab > /dev/null
+            echo "Helm template successfully rendered and validated."
+          fi
+
+  container-build-and-scan:
+    name: Container Build & Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./application/api
+          load: true
+          tags: resiliencelab-api:${{ github.sha }}
+
+      - name: Build Worker Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./application/worker
+          load: true
+          tags: resiliencelab-worker:${{ github.sha }}
+
+      - name: Scan API Image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: resiliencelab-api:${{ github.sha }}
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Scan Worker Image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: resiliencelab-worker:${{ github.sha }}
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'

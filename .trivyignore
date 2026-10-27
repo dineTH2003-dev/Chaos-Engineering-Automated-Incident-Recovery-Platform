@@ -1,0 +1,5 @@
+# ResilienceLab Trivy Security Policy & Ignore List
+# All ignored CVEs must document ID, package, and justification.
+# Unpatched upstream base image CVEs without vendor fixes may be documented here.
+
+# Example: CVE-YYYY-XXXX (Package: libxyz, Reason: No upstream Debian/Alpine fix available, low severity risk)

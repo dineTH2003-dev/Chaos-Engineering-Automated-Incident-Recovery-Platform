@@ -1,0 +1,19 @@
+{{- if .Values.worker.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: resiliencelab-worker
+    {{- include "resiliencelab.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.worker.service.type }}
+  ports:
+    - port: {{ .Values.worker.service.port }}
+      targetPort: {{ .Values.worker.service.targetPort }}
+      protocol: TCP
+      name: metrics
+  selector:
+    app: resiliencelab-worker
+{{- end }}

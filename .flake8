@@ -1,0 +1,15 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E203, W503, E501
+exclude =
+    .git,
+    .venv,
+    __pycache__,
+    build,
+    dist,
+    .pytest_cache,
+    reports
+per-file-ignores =
+    automation/incident/*: F401, F541, F841, E305
+    automation/incident/tests/*: F401, F541, F841
+    automation/webhook_receiver.py: F401

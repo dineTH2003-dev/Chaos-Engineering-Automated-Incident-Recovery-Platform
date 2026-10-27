@@ -1,0 +1,60 @@
+{{- if .Values.webhookReceiver.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-receiver
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: webhook-receiver
+    {{- include "resiliencelab.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.webhookReceiver.replicaCount }}
+  selector:
+    matchLabels:
+      app: webhook-receiver
+  template:
+    metadata:
+      labels:
+        app: webhook-receiver
+        {{- include "resiliencelab.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: webhook-receiver
+          image: "{{ .Values.webhookReceiver.image.repository }}:{{ .Values.webhookReceiver.image.tag }}"
+          imagePullPolicy: {{ .Values.webhookReceiver.image.pullPolicy | default .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.webhookReceiver.service.targetPort }}
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.webhookReceiver.service.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.webhookReceiver.service.targetPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.webhookReceiver.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-receiver
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: webhook-receiver
+    {{- include "resiliencelab.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.webhookReceiver.service.type }}
+  ports:
+    - port: {{ .Values.webhookReceiver.service.port }}
+      targetPort: {{ .Values.webhookReceiver.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: webhook-receiver
+{{- end }}

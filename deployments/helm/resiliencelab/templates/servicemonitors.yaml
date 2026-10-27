@@ -1,0 +1,45 @@
+{{- if .Values.serviceMonitors.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: resiliencelab-api
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: resiliencelab-api
+    release: kube-prometheus-stack
+    {{- include "resiliencelab.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: resiliencelab-api
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.global.namespace }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: resiliencelab-worker
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: resiliencelab-worker
+    release: kube-prometheus-stack
+    {{- include "resiliencelab.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: resiliencelab-worker
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.global.namespace }}
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+{{- end }}

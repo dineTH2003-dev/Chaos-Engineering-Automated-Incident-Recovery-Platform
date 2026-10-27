@@ -1,0 +1,137 @@
+# Default values for resiliencelab Helm Chart.
+# Environment overrides can be applied with -f values-dev.yaml or -f values-staging.yaml.
+
+global:
+  namespace: resiliencelab
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+
+api:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: resiliencelab-api
+    tag: "c49d3e3"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  probes:
+    readiness:
+      path: /ready
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+    liveness:
+      path: /health
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 5
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 75
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+
+worker:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: resiliencelab-worker
+    tag: "c49d3e3"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8001
+    targetPort: 8001
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  probes:
+    readiness:
+      path: /
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+    liveness:
+      path: /
+      initialDelaySeconds: 15
+      periodSeconds: 15
+      timeoutSeconds: 3
+      failureThreshold: 5
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
+postgres:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16-alpine"
+    pullPolicy: IfNotPresent
+  storage:
+    size: 1Gi
+    storageClassName: standard
+    pvcName: postgres-pvc
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+webhookReceiver:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: resiliencelab-webhook-receiver
+    tag: "v1"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5001
+    targetPort: 5001
+  resources:
+    requests:
+      cpu: 25m
+      memory: 48Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+serviceMonitors:
+  enabled: true
+
+config:
+  appName: resiliencelab-api
+  logLevel: INFO
+  dbPoolSize: "5"
+  dbMaxOverflow: "10"
+  dbPoolTimeout: "30"
+  dbPoolRecycle: "1800"
+  workerPollIntervalSeconds: "5"
+  workerBatchSize: "10"
+  workerProcessingDelaySeconds: "2"
+  workerLogLevel: INFO
+  workerQueueBackend: postgres
+  postgresDb: resiliencelab
+  postgresUser: resiliencelab

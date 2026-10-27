@@ -128,7 +128,51 @@ load-test-baseline: ## Run k6 baseline load test
 load-test-stress: ## Run k6 stress load test
 	$(K6_BIN) run load-testing/stress.js
 
-# ─── Observability ─────────────────────────────────────────────
+# ─── CI/CD (Phase 5) ──────────────────────────────────────────
+
+ci-lint: ## Run Python flake8 and YAML manifest validation
+	@echo "=== Running Flake8 Linter ==="
+	./.venv/bin/flake8 application/ automation/
+	@echo "=== Validating YAML Manifests ==="
+	@./.venv/bin/python -c 'import os, yaml; [list(yaml.safe_load_all(open(os.path.join(r, f)))) for r, _, fs in os.walk(".") if not any(x in r for x in [".git", ".venv", "__pycache__"]) for f in fs if f.endswith((".yaml", ".yml"))]; print("YAML manifests syntax OK")'
+
+ci-test: ## Run complete automated test suite (API + Incident Platform)
+	@echo "=== Running API Unit Tests ==="
+	PYTHONPATH=application/api ./.venv/bin/python -m pytest application/api/tests/ -v
+	@echo "=== Running Incident Platform Tests ==="
+	./.venv/bin/python -m pytest automation/incident/tests/ -v
+
+ci-validate-manifests: ## Dry-run validate Kubernetes manifests
+	kubectl apply --dry-run=client -f kubernetes/
+
+ci-build: ## Build container images with immutable Git commit SHA
+	./scripts/ci/build-and-scan.sh
+
+ci-scan: ## Run Trivy vulnerability scan against container images
+	trivy image --severity HIGH,CRITICAL --ignore-unfixed resiliencelab-api:$$(git rev-parse --short HEAD)
+	trivy image --severity HIGH,CRITICAL --ignore-unfixed resiliencelab-worker:$$(git rev-parse --short HEAD)
+
+helm-lint: ## Lint ResilienceLab Helm chart
+	helm lint deployments/helm/resiliencelab
+
+helm-template: ## Render and validate Helm chart templates for development
+	helm template resiliencelab deployments/helm/resiliencelab -f deployments/helm/environments/development/values.yaml
+
+gitops-status: ## Show status of Flux GitOps controllers, sources, and releases
+	@echo "=== Flux Controllers ==="
+	@kubectl get pods -n flux-system
+	@echo "\n=== Flux Git Sources ==="
+	@flux get sources git -A 2>/dev/null || kubectl get gitrepositories -A
+	@echo "\n=== Flux Helm Releases ==="
+	@flux get helmreleases -A 2>/dev/null || kubectl get helmreleases -A
+
+gitops-reconcile: ## Force immediate Flux GitOps reconciliation
+	@echo "=== Reconciling Git Repository ==="
+	@flux reconcile source git resiliencelab -n flux-system 2>/dev/null || kubectl get gitrepositories -n flux-system
+	@echo "=== Reconciling Helm Release ==="
+	@flux reconcile helmrelease resiliencelab -n resiliencelab 2>/dev/null || kubectl get helmreleases -n resiliencelab
+
+
 
 obs-status: ## Check status of observability stack
 	@echo "=== Monitoring Pods ==="

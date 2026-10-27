@@ -1,0 +1,23 @@
+# Development environment values overlay for Minikube
+global:
+  namespace: resiliencelab
+  imagePullPolicy: IfNotPresent
+
+api:
+  replicaCount: 2
+  image:
+    repository: resiliencelab-api
+    tag: "c49d3e3"
+    pullPolicy: IfNotPresent
+
+worker:
+  replicaCount: 1
+  image:
+    repository: resiliencelab-worker
+    tag: "c49d3e3"
+    pullPolicy: IfNotPresent
+
+config:
+  logLevel: DEBUG
+  workerLogLevel: DEBUG
+  workerPollIntervalSeconds: "5"

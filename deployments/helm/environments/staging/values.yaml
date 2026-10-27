@@ -1,0 +1,23 @@
+# Staging environment values overlay
+global:
+  namespace: resiliencelab
+  imagePullPolicy: IfNotPresent
+
+api:
+  replicaCount: 2
+  image:
+    repository: ghcr.io/dineth2003-dev/resiliencelab-api
+    tag: "c49d3e3"
+    pullPolicy: IfNotPresent
+
+worker:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/dineth2003-dev/resiliencelab-worker
+    tag: "c49d3e3"
+    pullPolicy: IfNotPresent
+
+config:
+  logLevel: INFO
+  workerLogLevel: INFO
+  workerPollIntervalSeconds: "5"
