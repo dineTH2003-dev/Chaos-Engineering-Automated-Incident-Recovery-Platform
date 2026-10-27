@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "incident_id": "INC-PM-API-01",
+    "title": "API Service Spike",
+    "severity": "WARNING",
+    "service": "api",
+    "namespace": "resiliencelab",
+    "status": "RESOLVED",
+    "source_alert": "APIHighErrorRate",
+    "started_at": "2026-10-27T14:20:18.513370",
+    "resolved_at": "2026-10-27T14:21:18.513370",
+    "generated_at": "2026-10-27T14:21:18.546781+00:00"
+  },
+  "durations": {
+    "ttd_seconds": 0.0,
+    "ttm_seconds": 45.0,
+    "ttr_seconds": 15.0,
+    "total_outage_seconds": 60.0
+  },
+  "impact": {
+    "users_impacted": "All external API consumers during degraded window",
+    "availability_drop_pct": 2.0,
+    "error_budget_consumed_pct": 0.2315
+  },
+  "root_cause_analysis": {
+    "suspected_cause": "Automated diagnosis determined workload failure",
+    "diagnostic_confidence": "HIGH",
+    "five_whys": [
+      "Why 1: Service 'api' stopped responding to requests.",
+      "Why 2: Underlying pods failed health check or database connection.",
+      "Why 3: Dependency became unreachable or resource limits saturated.",
+      "Why 4: Fault injection or infrastructure degradation triggered failure.",
+      "Why 5: Self-healing required runbook intervention or replica restoration."
+    ]
+  },
+  "timeline": [],
+  "remediations": [],
+  "preventive_actions": [
+    {
+      "action": "Introduce automated health watchdog for api",
+      "type": "Prevent",
+      "priority": "P1",
+      "owner": "SRE Platform Team"
+    },
+    {
+      "action": "Tune HPA scaling responsiveness and readiness probe thresholds",
+      "type": "Mitigate",
+      "priority": "P2",
+      "owner": "Cloud Infrastructure Team"
+    }
+  ]
+}

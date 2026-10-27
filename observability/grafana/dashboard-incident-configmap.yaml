@@ -1,0 +1,312 @@
+apiVersion: v1
+data:
+  incident-response.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 1,
+          "title": "Autonomous Incident Response & SRE Remediation Engine",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "description": "Number of currently active firing alerts in resiliencelab namespace",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
+                ]
+              }
+            }
+          },
+          "gridPos": { "h": 6, "w": 6, "x": 0, "y": 1 },
+          "id": 2,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "pluginVersion": "10.4.0",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "count(ALERTS{namespace=\"resiliencelab\", alertstate=\"firing\"}) or vector(0)",
+              "legendFormat": "Active Alerts",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Active Firing Alerts",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "description": "Real-time availability SLI over rolling window compared against 99.5% SLO target",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "max": 100,
+              "min": 90,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "yellow", "value": 98 },
+                  { "color": "green", "value": 99.5 }
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "gridPos": { "h": 6, "w": 6, "x": 6, "y": 1 },
+          "id": 3,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "10.4.0",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "clamp_max(100 - ((sum(rate(http_requests_total{namespace=\"resiliencelab\", status_code=~\"5..\"}[5m])) or vector(0)) / (sum(rate(http_requests_total{namespace=\"resiliencelab\"}[5m])) or vector(1)) * 100), 100)",
+              "legendFormat": "Availability SLI",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Availability SLI (Target: 99.5%)",
+          "type": "gauge"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "description": "Calculated error budget remaining (%) for 99.5% SLO",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "orange", "value": 20 },
+                  { "color": "yellow", "value": 50 },
+                  { "color": "green", "value": 80 }
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "gridPos": { "h": 6, "w": 6, "x": 12, "y": 1 },
+          "id": 4,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "clamp_min(100 - ((((sum(rate(http_requests_total{namespace=\"resiliencelab\", status_code=~\"5..\"}[1h])) or vector(0)) / (sum(rate(http_requests_total{namespace=\"resiliencelab\"}[1h])) or vector(1))) / 0.005) * 100), 0)",
+              "legendFormat": "Error Budget Remaining",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Error Budget Remaining",
+          "type": "gauge"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "description": "Ratio of actual error rate to allowed error rate (0.5%). Thresholds: 6.0x (Slow Burn), 14.4x (Fast Burn)",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Burn Rate Multiple",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 15,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "line+area" }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 6 },
+                  { "color": "red", "value": 14.4 }
+                ]
+              }
+            }
+          },
+          "gridPos": { "h": 6, "w": 6, "x": 18, "y": 1 },
+          "id": 5,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "((sum(rate(http_requests_total{namespace=\"resiliencelab\", status_code=~\"5..\"}[5m])) or vector(0)) / (sum(rate(http_requests_total{namespace=\"resiliencelab\"}[5m])) or vector(1))) / 0.005",
+              "legendFormat": "Burn Rate (5m)",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Error Budget Burn Rate",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+          "id": 6,
+          "title": "Workload Self-Healing & Remediation Verification",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "description": "Ready vs Desired replicas for API and Worker services",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 2
+              }
+            }
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "id": 7,
+          "options": {
+            "legend": { "displayMode": "table", "placement": "bottom" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "kube_deployment_status_replicas_ready{namespace=\"resiliencelab\", deployment=\"api\"}",
+              "legendFormat": "API Ready Replicas",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "kube_deployment_spec_replicas{namespace=\"resiliencelab\", deployment=\"api\"}",
+              "legendFormat": "API Desired Replicas",
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "kube_deployment_status_replicas_ready{namespace=\"resiliencelab\", deployment=\"postgres\"}",
+              "legendFormat": "PostgreSQL Ready Replicas",
+              "refId": "C"
+            }
+          ],
+          "title": "Deployment Replica Readiness",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "description": "API HTTP status code breakdown",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "stacking": { "group": "A", "mode": "normal" }
+              },
+              "unit": "reqps"
+            }
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "id": 8,
+          "options": {
+            "legend": { "displayMode": "table", "placement": "bottom" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "sum by (status_code) (rate(http_requests_total{namespace=\"resiliencelab\"}[1m]))",
+              "legendFormat": "HTTP {{status_code}}",
+              "refId": "A"
+            }
+          ],
+          "title": "HTTP Request Throughput by Status Code",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 39,
+      "tags": ["resiliencelab", "incident-response", "remediation", "slo"],
+      "templating": { "list": [] },
+      "time": { "from": "now-15m", "to": "now" },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "ResilienceLab - Incident Response & Remediation",
+      "uid": "resiliencelab-incident-response",
+      "version": 1
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    grafana_dashboard: "1"
+  name: grafana-dashboard-incident-response
+  namespace: monitoring

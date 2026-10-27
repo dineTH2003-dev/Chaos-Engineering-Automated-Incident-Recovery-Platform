@@ -195,7 +195,57 @@ Every experiment execution produces:
 
 ---
 
-## 7. Getting Started & Operations
+## 7. Automated Incident Response & Intelligent Remediation (Phase 4)
+
+ResilienceLab features an autonomous SRE Incident Response Engine hosted on port `5001`. It transforms passive alert reception into an intelligent incident investigation, guarded remediation, and postmortem generation platform.
+
+### A. Core Capabilities & Architecture
+
+```mermaid
+flowchart LR
+    Alerts[Alertmanager Alerts] --> Ingest[Normalized Ingestion & Dedup]
+    Ingest --> Corr[Dependency Correlation]
+    Corr --> Diag[Multi-Source Evidence Diagnosis]
+    Diag --> RB[Declarative Runbook Selection]
+    RB --> Policy[Safety Policy & Human Approval Gate]
+    Policy --> Exec[Guarded Executor / Dry-Run]
+    Exec --> Verify[Multi-Step Recovery Verification]
+    Verify --> SLO[SLO Error-Budget Accounting]
+    Verify --> PM[15-Section Postmortem Generator]
+```
+
+### B. Declarative Runbooks Catalog
+Declarative YAML runbooks (`automation/runbooks/`) drive recovery actions:
+- **`api-unavailable`**: Verifies self-healing, initiates rolling restart, and ensures replica count $\ge 2$. (Auto-approved)
+- **`database-unavailable`**: Verifies PVC integrity (`orders-db-pvc`), stages restore to 1 replica. (**Mandatory Human Approval**)
+- **`worker-failure`**: Performs rolling restart on background order processor. (Auto-approved)
+- **`high-cpu`**: Horizontally scales deployment up to 3 replicas within safe bounds ($1 \le N \le 4$). (Auto-approved)
+- **`high-latency`**: Checks Chaos Mesh state and validates transport stabilization. (Auto-approved)
+- **`pod-crash-loop`**: Restarts deployment to clear corrupted container states. (Auto-approved)
+
+### C. Human Approval Gate
+High-risk remediations (such as scaling or restarting the persistent stateful database tier) require explicit human operator approval via the Incident Management API:
+```bash
+# Approve remediation
+curl -X POST http://localhost:5001/api/incidents/<incident_id>/approve-remediation \
+  -H "Content-Type: application/json" \
+  -d '{"approval_id": "APP-XXXXXX", "decision": "APPROVED", "approver": "sre_lead"}'
+```
+
+### D. Multi-Step Independent Verification
+In strict accordance with SRE principles, an incident is **never** declared resolved based on command exit code alone. The Recovery Verification Engine independently validates:
+1. **Kubernetes Deployment Readiness**: Desired replicas ready and running.
+2. **Consecutive Probes**: 3 consecutive successful `/health` and `/ready` probes.
+3. **Telemetry Health**: Prometheus 5xx error rate $< 1.0\%$.
+
+### E. Error Budget & Burn Rate Accounting
+- **Rolling Availability SLI**: Tracked against 99.5% SLO (Allowed downtime: 216m / 12,960s per 30d).
+- **Multi-Window Burn Rates**: Fast burn ($\ge 14.4\times$) and Slow burn ($\ge 6.0\times$) detection.
+- **Incident Error-Budget Consumption**: Computed mathematically and rendered on Grafana Dashboard 6.
+
+---
+
+## 8. Getting Started & Operations
 
 ### Prerequisites
 - Docker Desktop or Docker CE
@@ -274,9 +324,21 @@ make chaos-verify-recovery
 make chaos-reports
 ```
 
+### Incident Response Operations (Phase 4)
+```bash
+# Run full Phase 4 test suite (37 unit & E2E tests)
+make incident-test
+
+# Query active incidents & SRE error budgets
+make incident-status
+
+# Inspect generated SRE postmortems
+make incident-postmortems
+```
+
 ---
 
-## 8. Troubleshooting Guide
+## 9. Troubleshooting Guide
 
 | Issue | Root Cause | Solution |
 |---|---|---|

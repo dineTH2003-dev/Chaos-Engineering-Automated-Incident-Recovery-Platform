@@ -1,0 +1,17 @@
+id: "worker-failure"
+name: "Worker Processing Failure Recovery"
+description: "Recovers the background order processing worker service"
+target_service: "worker"
+matching_alerts:
+  - "WorkerProcessingFailures"
+  - "WorkerDown"
+preconditions:
+  namespace: "resiliencelab"
+actions:
+  - step: 1
+    action_type: "restart_deployment"
+    target_resource: "deploy/worker"
+    risk_level: "LOW"
+    requires_approval: false
+    description: "Perform rolling restart of worker deployment"
+    parameters: {}

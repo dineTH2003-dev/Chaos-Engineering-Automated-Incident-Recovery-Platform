@@ -1,0 +1,17 @@
+id: "pod-crash-loop"
+name: "Pod CrashLoopBackOff Recovery"
+description: "Handles pods trapped in crash loop backoff state via rolling restart"
+target_service: "api"
+matching_alerts:
+  - "PodCrashLooping"
+  - "ContainerRestarting"
+preconditions:
+  namespace: "resiliencelab"
+actions:
+  - step: 1
+    action_type: "restart_deployment"
+    target_resource: "deploy/{service}"
+    risk_level: "LOW"
+    requires_approval: false
+    description: "Perform rolling deployment restart to clear broken container state"
+    parameters: {}

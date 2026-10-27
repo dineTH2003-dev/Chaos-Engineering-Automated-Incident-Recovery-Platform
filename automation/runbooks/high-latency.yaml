@@ -1,0 +1,25 @@
+id: "high-latency"
+name: "High Request Latency Mitigation"
+description: "Mitigates network latency anomalies and verifies downstream transport health"
+target_service: "api"
+matching_alerts:
+  - "HighRequestLatency"
+  - "LatencySpike"
+preconditions:
+  namespace: "resiliencelab"
+actions:
+  - step: 1
+    action_type: "verify_self_healing"
+    target_resource: "deploy/api"
+    risk_level: "LOW"
+    requires_approval: false
+    description: "Verify if latency transient settles or self-healing stabilizes"
+    parameters:
+      wait_seconds: 10
+  - step: 2
+    action_type: "check_chaos_mesh"
+    target_resource: "networkchaos"
+    risk_level: "LOW"
+    requires_approval: false
+    description: "Inspect whether NetworkChaos fault injection experiment is currently active"
+    parameters: {}

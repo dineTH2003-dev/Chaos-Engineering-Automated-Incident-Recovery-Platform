@@ -1,0 +1,29 @@
+id: "database-unavailable"
+name: "PostgreSQL Database Recovery"
+description: "Handles database connection failures and restores database deployment safely"
+target_service: "postgres"
+matching_alerts:
+  - "DatabaseConnectionFailures"
+  - "PostgresDown"
+  - "DatabaseDown"
+preconditions:
+  namespace: "resiliencelab"
+  pvc_must_exist: "orders-db-pvc"
+  prevent_pvc_deletion: true
+actions:
+  - step: 1
+    action_type: "verify_pvc_integrity"
+    target_resource: "pvc/orders-db-pvc"
+    risk_level: "LOW"
+    requires_approval: false
+    description: "Verify persistent volume claim orders-db-pvc is intact and Bound"
+    parameters:
+      pvc_name: "orders-db-pvc"
+  - step: 2
+    action_type: "scale_deployment"
+    target_resource: "deploy/postgres"
+    risk_level: "HIGH"
+    requires_approval: true
+    description: "Scale PostgreSQL deployment to 1 replica to restore database connectivity"
+    parameters:
+      replicas: 1

@@ -199,6 +199,32 @@ chaos-reports: ## List all generated experiment and incident reports
 	@echo "\n=== Markdown Incident Reports ==="
 	@ls -lh reports/incidents/
 
+# ─── Phase 4: Incident Response & Intelligent Remediation ────────
+
+incident-test: ## Run full Phase 4 incident test suite (unit + E2E)
+	./.venv/bin/python -m pytest automation/incident/tests/ -v
+
+incident-run: ## Run incident engine locally on port 5001
+	./.venv/bin/python -m uvicorn automation.incident.api.main:app --host 0.0.0.0 --port 5001
+
+incident-build: ## Build incident webhook receiver container image
+	eval $$(minikube docker-env) && \
+		docker build -t resiliencelab-webhook-receiver:v1 ./automation
+
+incident-deploy: ## Deploy incident engine to Kubernetes
+	kubectl apply -f kubernetes/webhook-receiver.yaml
+	kubectl rollout restart deployment/webhook-receiver -n $(NAMESPACE)
+
+incident-status: ## Query active incidents and SRE SLO metrics
+	@echo "=== Active Incidents ==="
+	@curl -s http://localhost:5001/api/incidents | jq . 2>/dev/null || curl -s http://localhost:5001/api/incidents || true
+	@echo "\n=== SRE SLO & Error Budget Status ==="
+	@curl -s http://localhost:5001/api/slo | jq . 2>/dev/null || curl -s http://localhost:5001/api/slo || true
+
+incident-postmortems: ## List all generated SRE postmortem reports
+	@echo "=== Generated SRE Postmortems ==="
+	@ls -lh reports/postmortems/ 2>/dev/null || echo "No postmortems generated yet."
+
 # ─── Clean ─────────────────────────────────────────────────────
 
 clean: ## Full cleanup — stop cluster, remove compose volumes

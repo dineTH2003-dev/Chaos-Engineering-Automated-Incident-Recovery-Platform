@@ -1,0 +1,288 @@
+{
+  "metadata": {
+    "incident_id": "INC-20261027-BF76",
+    "title": "PostgreSQL database unavailable",
+    "severity": "CRITICAL",
+    "service": "postgres",
+    "namespace": "resiliencelab",
+    "status": "RESOLVED",
+    "source_alert": "DatabaseConnectionFailures",
+    "started_at": "2026-10-27T14:21:25.738837",
+    "resolved_at": "2026-10-27T14:21:32.634447",
+    "generated_at": "2026-10-27T14:21:32.661774+00:00"
+  },
+  "durations": {
+    "ttd_seconds": 0.0,
+    "ttm_seconds": 0.8,
+    "ttr_seconds": 6.1,
+    "total_outage_seconds": 6.9
+  },
+  "impact": {
+    "users_impacted": "All external API consumers during degraded window",
+    "availability_drop_pct": 0.23,
+    "error_budget_consumed_pct": 0.0532
+  },
+  "root_cause_analysis": {
+    "suspected_cause": "PostgreSQL database failure: postgres deployment scaled to 0 replicas, API /ready probe reports database unreachable (HTTP 503)",
+    "diagnostic_confidence": "HIGH",
+    "five_whys": [
+      "Why 1: Service 'postgres' stopped responding to requests.",
+      "Why 2: Underlying pods failed health check or database connection.",
+      "Why 3: Dependency became unreachable or resource limits saturated.",
+      "Why 4: Fault injection or infrastructure degradation triggered failure.",
+      "Why 5: Self-healing required runbook intervention or replica restoration."
+    ]
+  },
+  "timeline": [
+    {
+      "timestamp": "2026-10-27T14:21:25.763465",
+      "relative_seconds": 0.0,
+      "event_type": "INCIDENT_TRIGGERED",
+      "summary": "Incident opened: PostgreSQL database unavailable",
+      "actor": "SYSTEM",
+      "details": {
+        "service": "postgres",
+        "severity": "critical",
+        "source_alert": "DatabaseConnectionFailures"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:25.768574",
+      "relative_seconds": 0.0,
+      "event_type": "ALERT_RECEIVED",
+      "summary": "Alertmanager fired alert DatabaseConnectionFailures",
+      "actor": "ALERTMANAGER",
+      "details": {
+        "fingerprint": "fp-e2e-pg-01",
+        "labels": {
+          "alertname": "DatabaseConnectionFailures",
+          "severity": "critical",
+          "service": "postgres",
+          "namespace": "resiliencelab"
+        },
+        "annotations": {
+          "summary": "PostgreSQL database unavailable"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:26.469913",
+      "relative_seconds": 0.7,
+      "event_type": "STATE_TRANSITION_INVESTIGATING",
+      "summary": "State transitioned from TRIGGERED to INVESTIGATING: Automated diagnosis completed: PostgreSQL database failure: postgres deployment scaled to 0 replicas, API /ready probe reports data",
+      "actor": "AUTO_DIAGNOSIS",
+      "details": {
+        "from_state": "TRIGGERED",
+        "to_state": "INVESTIGATING",
+        "reason": "Automated diagnosis completed: PostgreSQL database failure: postgres deployment scaled to 0 replicas, API /ready probe reports data"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:26.472758",
+      "relative_seconds": 0.7,
+      "event_type": "DIAGNOSIS_COMPLETED",
+      "summary": "Automated diagnosis (HIGH confidence): PostgreSQL database failure: postgres deployment scaled to 0 replicas, API /ready probe reports database unreachable (HTTP 503)",
+      "actor": "AUTO_DIAGNOSIS",
+      "details": {
+        "suspected_cause": "PostgreSQL database failure: postgres deployment scaled to 0 replicas, API /ready probe reports database unreachable (HTTP 503)",
+        "confidence": "HIGH",
+        "recommended_runbook": "database-unavailable",
+        "recommended_actions": [
+          {
+            "action_type": "scale_deployment",
+            "target_resource": "deploy/postgres",
+            "parameters": {
+              "replicas": 1
+            },
+            "risk_level": "HIGH",
+            "requires_approval": true
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:26.491913",
+      "relative_seconds": 0.8,
+      "event_type": "STATE_TRANSITION_REMEDIATING",
+      "summary": "State transitioned from INVESTIGATING to REMEDIATING: Starting runbook-guided remediation",
+      "actor": "SRE_AUTOMATION",
+      "details": {
+        "from_state": "INVESTIGATING",
+        "to_state": "REMEDIATING",
+        "reason": "Starting runbook-guided remediation"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:26.538963",
+      "relative_seconds": 0.8,
+      "event_type": "REMEDIATION_DRY_RUN",
+      "summary": "Remediation step 1: [DRY-RUN SIMULATION] Would execute: kubectl get pvc orders-db-pvc -n resiliencelab -o json (risk=LOW, parameters={'pvc_name': 'orders-db-pvc'})",
+      "actor": "SRE_AUTOMATION",
+      "details": {
+        "remediation_id": "REM-ECFB70",
+        "action_type": "verify_pvc_integrity",
+        "target_resource": "pvc/orders-db-pvc",
+        "dry_run": true,
+        "success": true,
+        "output": "[DRY-RUN SIMULATION] Would execute: kubectl get pvc orders-db-pvc -n resiliencelab -o json (risk=LOW, parameters={'pvc_name': 'orders-db-pvc'})"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:26.554708",
+      "relative_seconds": 0.8,
+      "event_type": "APPROVAL_REQUESTED",
+      "summary": "Human approval required: Scale PostgreSQL deployment to 1 replica to restore database connectivity (Risk: HIGH)",
+      "actor": "REMEDIATION_ENGINE",
+      "details": {
+        "id": "APP-9BDD30",
+        "incident_id": "INC-20261027-BF76",
+        "remediation_id": "REM-F5CD10",
+        "action": "scale_deployment on deploy/postgres",
+        "reason": "Scale PostgreSQL deployment to 1 replica to restore database connectivity",
+        "risk_level": "HIGH",
+        "approver": null,
+        "decision": "PENDING",
+        "decision_reason": null,
+        "created_at": "2026-10-27T14:21:26.551911",
+        "decided_at": null,
+        "expires_at": "2026-10-27T14:26:26.550665"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:26.585325",
+      "relative_seconds": 0.8,
+      "event_type": "APPROVAL_GRANTED",
+      "summary": "Remediation approved by sre_lead_operator: Database PVC verified intact, approving restore to 1 replica",
+      "actor": "sre_lead_operator",
+      "details": {
+        "approval_id": "APP-9BDD30",
+        "approver": "sre_lead_operator"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:26.593322",
+      "relative_seconds": 0.9,
+      "event_type": "REMEDIATION_DRY_RUN",
+      "summary": "Approved remediation executed: [DRY-RUN SIMULATION] Would execute: kubectl scale deploy/postgres --replicas=1 -n resiliencelab (risk=HIGH, parameters={'replicas': 1})",
+      "actor": "sre_lead_operator",
+      "details": {
+        "remediation_id": "REM-F5CD10",
+        "dry_run": true,
+        "success": true,
+        "output": "[DRY-RUN SIMULATION] Would execute: kubectl scale deploy/postgres --replicas=1 -n resiliencelab (risk=HIGH, parameters={'replicas': 1})"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:26.613030",
+      "relative_seconds": 0.9,
+      "event_type": "STATE_TRANSITION_VERIFYING",
+      "summary": "State transitioned from REMEDIATING to VERIFYING: Remediation executed; entering recovery verification",
+      "actor": "sre_lead_operator",
+      "details": {
+        "from_state": "REMEDIATING",
+        "to_state": "VERIFYING",
+        "reason": "Remediation executed; entering recovery verification"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:32.640725",
+      "relative_seconds": 6.9,
+      "event_type": "STATE_TRANSITION_RESOLVED",
+      "summary": "State transitioned from VERIFYING to RESOLVED: Recovery verified: All recovery checks passed: K8s pods ready, consecutive probes succeeded, telemetry healthy.",
+      "actor": "VERIFICATION_ENGINE",
+      "details": {
+        "from_state": "VERIFYING",
+        "to_state": "RESOLVED",
+        "reason": "Recovery verified: All recovery checks passed: K8s pods ready, consecutive probes succeeded, telemetry healthy."
+      }
+    },
+    {
+      "timestamp": "2026-10-27T14:21:32.643024",
+      "relative_seconds": 6.9,
+      "event_type": "RECOVERY_VERIFIED",
+      "summary": "Incident resolved: All recovery checks passed: K8s pods ready, consecutive probes succeeded, telemetry healthy.",
+      "actor": "VERIFICATION_ENGINE",
+      "details": {
+        "consecutive_successes": 3,
+        "required_successes": 3,
+        "deployment_status": {
+          "healthy": true,
+          "desired": 1,
+          "ready": 1
+        },
+        "telemetry_status": {
+          "healthy": true
+        }
+      }
+    }
+  ],
+  "remediations": [
+    {
+      "id": "REM-ECFB70",
+      "incident_id": "INC-20261027-BF76",
+      "runbook_id": "database-unavailable",
+      "action_type": "verify_pvc_integrity",
+      "target_resource": "pvc/orders-db-pvc",
+      "namespace": "resiliencelab",
+      "parameters": {
+        "pvc_name": "orders-db-pvc"
+      },
+      "risk_level": "LOW",
+      "requires_approval": false,
+      "state": "COMPLETED",
+      "dry_run": true,
+      "execution_output": "[DRY-RUN SIMULATION] Would execute: kubectl get pvc orders-db-pvc -n resiliencelab -o json (risk=LOW, parameters={'pvc_name': 'orders-db-pvc'})",
+      "created_at": "2026-10-27T14:21:26.530251",
+      "executed_at": "2026-10-27T14:21:26.536106",
+      "approvals": []
+    },
+    {
+      "id": "REM-F5CD10",
+      "incident_id": "INC-20261027-BF76",
+      "runbook_id": "database-unavailable",
+      "action_type": "scale_deployment",
+      "target_resource": "deploy/postgres",
+      "namespace": "resiliencelab",
+      "parameters": {
+        "replicas": 1
+      },
+      "risk_level": "HIGH",
+      "requires_approval": true,
+      "state": "COMPLETED",
+      "dry_run": true,
+      "execution_output": "[DRY-RUN SIMULATION] Would execute: kubectl scale deploy/postgres --replicas=1 -n resiliencelab (risk=HIGH, parameters={'replicas': 1})",
+      "created_at": "2026-10-27T14:21:26.549061",
+      "executed_at": "2026-10-27T14:21:26.590937",
+      "approvals": [
+        {
+          "id": "APP-9BDD30",
+          "incident_id": "INC-20261027-BF76",
+          "remediation_id": "REM-F5CD10",
+          "action": "scale_deployment on deploy/postgres",
+          "reason": "Scale PostgreSQL deployment to 1 replica to restore database connectivity",
+          "risk_level": "HIGH",
+          "approver": "sre_lead_operator",
+          "decision": "APPROVED",
+          "decision_reason": "Database PVC verified intact, approving restore to 1 replica",
+          "created_at": "2026-10-27T14:21:26.551911",
+          "decided_at": "2026-10-27T14:21:26.577023",
+          "expires_at": "2026-10-27T14:26:26.550665"
+        }
+      ]
+    }
+  ],
+  "preventive_actions": [
+    {
+      "action": "Introduce automated health watchdog for postgres",
+      "type": "Prevent",
+      "priority": "P1",
+      "owner": "SRE Platform Team"
+    },
+    {
+      "action": "Tune HPA scaling responsiveness and readiness probe thresholds",
+      "type": "Mitigate",
+      "priority": "P2",
+      "owner": "Cloud Infrastructure Team"
+    }
+  ]
+}

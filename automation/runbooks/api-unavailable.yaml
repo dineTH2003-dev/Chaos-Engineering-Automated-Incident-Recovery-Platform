@@ -1,0 +1,36 @@
+id: "api-unavailable"
+name: "API Service Unavailable Recovery"
+description: "Mitigates high 5xx error rates and unresponsive pods for the API service"
+target_service: "api"
+matching_alerts:
+  - "APIHighErrorRate"
+  - "APISlowResponses"
+  - "APIPodFailure"
+  - "APIDown"
+preconditions:
+  namespace: "resiliencelab"
+  max_replicas: 4
+actions:
+  - step: 1
+    action_type: "verify_self_healing"
+    target_resource: "deploy/api"
+    risk_level: "LOW"
+    requires_approval: false
+    description: "Allow 15s for Kubernetes ReplicaSet to self-heal failed pods"
+    parameters:
+      wait_seconds: 15
+  - step: 2
+    action_type: "restart_deployment"
+    target_resource: "deploy/api"
+    risk_level: "LOW"
+    requires_approval: false
+    description: "Perform rolling restart of API deployment"
+    parameters: {}
+  - step: 3
+    action_type: "scale_deployment"
+    target_resource: "deploy/api"
+    risk_level: "MEDIUM"
+    requires_approval: false
+    description: "Ensure baseline replica count is at least 2"
+    parameters:
+      replicas: 2

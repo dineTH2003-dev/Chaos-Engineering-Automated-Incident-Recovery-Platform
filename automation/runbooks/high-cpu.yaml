@@ -1,0 +1,19 @@
+id: "high-cpu"
+name: "High CPU Saturation Scaling Recovery"
+description: "Alleviates high CPU saturation by scaling deployment replicas within safe bounds"
+target_service: "api"
+matching_alerts:
+  - "HighCPUUtilization"
+  - "CPUSaturation"
+preconditions:
+  namespace: "resiliencelab"
+  max_replicas: 4
+actions:
+  - step: 1
+    action_type: "scale_deployment"
+    target_resource: "deploy/api"
+    risk_level: "MEDIUM"
+    requires_approval: false
+    description: "Scale API service to 3 replicas to distribute CPU load"
+    parameters:
+      replicas: 3
