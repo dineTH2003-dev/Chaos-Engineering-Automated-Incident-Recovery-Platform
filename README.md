@@ -68,6 +68,10 @@ graph TB
 | **Chaos Injection** | Chaos Mesh | v2.8.6 | Kubernetes-native chaos orchestration (`PodChaos`, `NetworkChaos`, `StressChaos`) |
 | **Load Testing** | Grafana k6 | v0.56.0 | Performance benchmarking & load generation |
 | **Incident Receiver**| FastAPI Webhook | 1.0.0 | Structured incident event logger (`/reports/incidents/`) |
+| **GitOps Controller**| Flux CD v2 | v2.4.0 | Declarative GitOps reconciliation & drift self-healing |
+| **Package Manager**  | Helm | v3.16.3 | Parameterized multi-environment Kubernetes packaging |
+| **Vulnerability Gate**| Trivy | v0.76.1 | Static security scanning & container supply chain gate |
+| **CI Automation**    | GitHub Actions | v4 / v5 | Automated linting, test suites, and image builds |
 
 ---
 
@@ -336,9 +340,63 @@ make incident-status
 make incident-postmortems
 ```
 
+### GitOps-Driven CI/CD & Progressive Delivery (Phase 5)
+```bash
+# Run CI pipeline linting & static YAML validation
+make ci-lint
+
+# Run complete automated test suite (API + Incident Platform + Deployment Platform)
+make ci-test
+
+# Build container images with immutable Git commit SHA and Trivy security scanning
+make ci-build
+make ci-scan
+
+# Lint and template-render the ResilienceLab Helm chart
+make helm-lint
+make helm-template
+
+# Inspect Flux CD controllers, Git sources, and Helm releases
+make gitops-status
+
+# Force immediate Flux GitOps reconciliation (remediate drift)
+make gitops-reconcile
+
+# Query live deployment status, GitOps tags, and cluster pods
+make deployment-status
+
+# Execute SRE Deployment Health Verification against active release
+make deployment-verify
+
+# Evaluate SRE-Aware SLO Release Gates against real-time Prometheus telemetry
+make deployment-gate
+
+# View append-only deployment audit history
+make deployment-history
+
+# Execute automated rollback to previous known-healthy revision & trigger Phase 4 incident
+make deployment-rollback
+
+# Display latest verification and gate evaluation JSON reports
+make release-report
+```
+
 ---
 
-## 9. Troubleshooting Guide
+## 9. Phase 5 GitOps & Progressive Delivery Overview
+
+Phase 5 transitions ResilienceLab into a declarative, self-healing continuous delivery platform:
+1. **Pull-Based GitOps**: Flux CD continuously monitors the repository. Manifest changes pushed to Git are automatically synchronized into the cluster without providing CI runners external cluster admin access.
+2. **Automated Drift Self-Healing**: Any out-of-band changes (e.g. ad-hoc `kubectl scale` or `kubectl edit`) are actively detected and corrected within seconds.
+3. **Container Supply Chain Security**: Images are tagged immutably with Git commit SHAs and scanned with Trivy. Deployments are automatically blocked if unmitigated HIGH or CRITICAL CVEs are detected.
+4. **SRE Health Verification Engine**: Releases are verified using a 4-step sequence: K8s rollout status, pod readiness and zero restart count, 3 consecutive HTTP `/health` & `/ready` probes, and live Prometheus telemetry.
+5. **SRE-Aware SLO Release Gates**: Rollouts are evaluated against active Phase 4 incidents, 99.5% rolling availability, 500ms p95 tail latency, and 14.4x error budget fast-burn rates.
+6. **Automated Rollback & Incident Escalation**: Releases failing verification are safely rolled back via GitOps, followed by automatic escalation and postmortem generation in the Phase 4 Incident Response Platform.
+7. **Grafana Dashboard 7 (Deployment Reliability & DORA Metrics)**: Real-time visualization of Deployment Frequency, Lead Time for Changes, Change Failure Rate, and Mean Time to Recovery (MTTR).
+
+---
+
+## 10. Troubleshooting Guide
 
 | Issue | Root Cause | Solution |
 |---|---|---|

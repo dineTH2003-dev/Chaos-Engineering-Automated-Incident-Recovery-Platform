@@ -1,0 +1,23 @@
+{
+  "deployment_id": "DEP-TEST-003",
+  "decision": "ABORT",
+  "passed": false,
+  "reasons": [
+    "Availability SLI (92.0%) breached target (99.5%)",
+    "Tail latency p95 (600.0ms) breached objective (500.0ms)",
+    "Critical error budget fast burn detected: 16.0x >= 14.4x threshold"
+  ],
+  "metrics": {
+    "active_critical_incidents": [],
+    "request_rate_rps": 15.0,
+    "sufficient_traffic": true,
+    "availability_pct": 92.0,
+    "availability_target_pct": 99.5,
+    "p95_latency_ms": 600.0,
+    "latency_target_ms": 500.0,
+    "burn_rate_1h": 16.0
+  },
+  "active_incidents": [],
+  "evaluated_at": "2026-10-27T16:17:00.342494+00:00",
+  "can_override": true
+}

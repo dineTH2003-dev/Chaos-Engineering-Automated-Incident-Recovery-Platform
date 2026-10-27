@@ -1,0 +1,64 @@
+{
+  "deployment_id": "DEP-20261027160757",
+  "service": "api",
+  "image_tag": "c49d3e3",
+  "passed": true,
+  "start_time": "2026-10-27T16:07:57.545032+00:00",
+  "completion_time": "2026-10-27T16:08:02.281379+00:00",
+  "duration_seconds": 4.74,
+  "steps": [
+    {
+      "step_name": "k8s_rollout_status",
+      "passed": true,
+      "details": {
+        "output": "deployment \"api\" successfully rolled out"
+      },
+      "error": null
+    },
+    {
+      "step_name": "replicas_and_restarts",
+      "passed": true,
+      "details": {
+        "total_pods": 2,
+        "ready_pods": 2,
+        "restart_counts": {
+          "api-b98588b4b-nlwnr": 0,
+          "api-b98588b4b-q9x59": 0
+        }
+      },
+      "error": null
+    },
+    {
+      "step_name": "consecutive_http_probes",
+      "passed": true,
+      "details": {
+        "required_streak": 3,
+        "achieved_streak": 3,
+        "total_attempts": 3,
+        "endpoints_probed": [
+          "http://localhost:8000/health",
+          "http://localhost:8000/ready"
+        ]
+      },
+      "error": null
+    },
+    {
+      "step_name": "prometheus_telemetry_slis",
+      "passed": true,
+      "details": {
+        "error_rate_pct": 0.0,
+        "max_allowed_error_rate_pct": 1.0,
+        "p95_latency_ms": 23.35,
+        "max_allowed_latency_ms": 500.0
+      },
+      "error": null
+    }
+  ],
+  "failure_reason": null,
+  "telemetry_snapshot": {
+    "error_rate_pct": 0.0,
+    "max_allowed_error_rate_pct": 1.0,
+    "p95_latency_ms": 23.35,
+    "max_allowed_latency_ms": 500.0
+  }
+}

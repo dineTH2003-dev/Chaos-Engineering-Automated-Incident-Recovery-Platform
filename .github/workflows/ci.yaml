@@ -1,6 +1,6 @@
 name: CI Pipeline
 
-on:
+'on':
   push:
     branches: [ main ]
   pull_request:
@@ -42,7 +42,7 @@ jobs:
           python3 -c '
           import os, yaml
           for root, _, files in os.walk("."):
-              if any(skip in root for skip in [".git", ".venv", "__pycache__"]): continue
+              if any(skip in root for skip in [".git", ".venv", "__pycache__", "templates"]): continue
               for f in files:
                   if f.endswith((".yaml", ".yml")):
                       p = os.path.join(root, f)
@@ -83,6 +83,10 @@ jobs:
       - name: Run Phase 4 Incident Engine Tests
         run: |
           pytest automation/incident/tests/ -v
+
+      - name: Run Phase 5 Deployment Platform Tests
+        run: |
+          pytest automation/deployment/tests/ -v
 
   manifest-and-helm-validation:
     name: Kubernetes & Helm Validation

@@ -1,6 +1,6 @@
 # Postmortem: INC-PM-API-01 — API Service Spike
 
-**Date:** 2026-10-27T14:20:18.513370 | **Severity:** `WARNING` | **Status:** `RESOLVED` | **Service:** `api`
+**Date:** 2026-10-27T16:15:46.581900 | **Severity:** `WARNING` | **Status:** `RESOLVED` | **Service:** `api`
 
 ## 1. Incident Overview
 - **Incident ID:** `INC-PM-API-01`
@@ -75,5 +75,5 @@ On 2026-10-27, service `api` experienced an incident triggered by `APIHighErrorR
 
 ## 15. Sign-off & Audit Trail
 - **Author:** ResilienceLab SRE Autonomous Agent v1.0.0
-- **Generated At:** 2026-10-27T14:21:18.546781+00:00
+- **Generated At:** 2026-10-27T16:16:46.597572+00:00
 - **Review Status:** Signed off by Automated SRE Supervisor

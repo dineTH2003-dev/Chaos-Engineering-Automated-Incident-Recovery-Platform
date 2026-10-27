@@ -1,0 +1,19 @@
+{
+  "deployment_id": "DEP-TEST-001",
+  "decision": "PROMOTE",
+  "passed": true,
+  "reasons": [],
+  "metrics": {
+    "active_critical_incidents": [],
+    "request_rate_rps": 10.0,
+    "sufficient_traffic": true,
+    "availability_pct": 99.9,
+    "availability_target_pct": 99.5,
+    "p95_latency_ms": 45.0,
+    "latency_target_ms": 500.0,
+    "burn_rate_1h": 0.2
+  },
+  "active_incidents": [],
+  "evaluated_at": "2026-10-27T16:17:00.301936+00:00",
+  "can_override": false
+}

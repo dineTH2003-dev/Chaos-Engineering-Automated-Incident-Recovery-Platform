@@ -1,0 +1,24 @@
+{
+  "deployment_id": "SCENARIO-2-FAIL",
+  "service": "api",
+  "image_tag": "sha-bad9999",
+  "passed": false,
+  "start_time": "2026-10-27T16:17:00.132537+00:00",
+  "completion_time": "2026-10-27T16:17:00.132600+00:00",
+  "duration_seconds": 0.0,
+  "steps": [
+    {
+      "method_calls": [],
+      "passed": true,
+      "step_name": "rollout"
+    },
+    {
+      "method_calls": [],
+      "passed": false,
+      "step_name": "replicas",
+      "error": "CrashLoopBackOff"
+    }
+  ],
+  "failure_reason": "Replica check failed: CrashLoopBackOff",
+  "telemetry_snapshot": {}
+}

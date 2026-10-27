@@ -55,6 +55,13 @@ docker build \
 
 echo "Containers built successfully."
 
+# If Minikube is active locally, sync images directly to cluster
+if command -v minikube >/dev/null 2>&1 && minikube status >/dev/null 2>&1; then
+    echo "Syncing images into Minikube cluster daemon..."
+    minikube image load "${LOCAL_API}" || true
+    minikube image load "${LOCAL_WORKER}" || true
+fi
+
 # 2. Security Vulnerability Scanning with Trivy
 TRIVY_BIN=""
 if command -v trivy >/dev/null 2>&1; then

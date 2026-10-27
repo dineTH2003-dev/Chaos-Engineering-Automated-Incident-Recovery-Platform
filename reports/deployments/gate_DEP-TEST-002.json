@@ -1,0 +1,25 @@
+{
+  "deployment_id": "DEP-TEST-002",
+  "decision": "ABORT",
+  "passed": false,
+  "reasons": [
+    "Blocked by 1 active critical incident(s): INC-20261027-01 (API Outage)"
+  ],
+  "metrics": {
+    "active_critical_incidents": [
+      "INC-20261027-01 (API Outage)"
+    ],
+    "request_rate_rps": 0.733,
+    "sufficient_traffic": true,
+    "availability_pct": 100.0,
+    "availability_target_pct": 99.5,
+    "p95_latency_ms": 22.56,
+    "latency_target_ms": 500.0,
+    "burn_rate_1h": 0.0
+  },
+  "active_incidents": [
+    "INC-20261027-01 (API Outage)"
+  ],
+  "evaluated_at": "2026-10-27T16:17:00.339476+00:00",
+  "can_override": true
+}

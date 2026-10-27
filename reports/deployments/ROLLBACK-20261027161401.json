@@ -1,0 +1,36 @@
+{
+  "rollback_id": "ROLLBACK-20261027161401",
+  "deployment_id": "DEP-12345",
+  "service": "api",
+  "failed_image_tag": "v2-broken",
+  "restored_image_tag": "v1-stable",
+  "status": "COMPLETED_RECOVERED",
+  "recovered": true,
+  "incident_id": "INC-20261027-ROLLBACK",
+  "timeline": [
+    {
+      "time": "2026-10-27T16:14:01.938561+00:00",
+      "event": "ROLLBACK_INITIATED",
+      "failed_tag": "v2-broken"
+    },
+    {
+      "time": "2026-10-27T16:14:01.938663+00:00",
+      "event": "GITOPS_REVERTED",
+      "restored_tag": "v1-stable"
+    },
+    {
+      "time": "2026-10-27T16:14:01.938677+00:00",
+      "event": "FLUX_RECONCILE_TRIGGERED"
+    },
+    {
+      "time": "2026-10-27T16:14:01.938687+00:00",
+      "event": "RECOVERY_VERIFIED",
+      "passed": true
+    },
+    {
+      "time": "2026-10-27T16:14:01.938697+00:00",
+      "event": "INCIDENT_ESCALATED",
+      "incident_id": "INC-20261027-ROLLBACK"
+    }
+  ]
+}

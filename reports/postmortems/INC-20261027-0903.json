@@ -1,0 +1,273 @@
+{
+  "metadata": {
+    "incident_id": "INC-20261027-0903",
+    "title": "API 5xx error rate exceeded 5%",
+    "severity": "CRITICAL",
+    "service": "api",
+    "namespace": "resiliencelab",
+    "status": "RESOLVED",
+    "source_alert": "APIHighErrorRate",
+    "started_at": "2026-10-27T16:16:46.607887",
+    "resolved_at": "2026-10-27T16:16:52.964100",
+    "generated_at": "2026-10-27T16:16:52.988683+00:00"
+  },
+  "durations": {
+    "ttd_seconds": 0.0,
+    "ttm_seconds": 0.3,
+    "ttr_seconds": 6.1,
+    "total_outage_seconds": 6.4
+  },
+  "impact": {
+    "users_impacted": "All external API consumers during degraded window",
+    "availability_drop_pct": 0.21,
+    "error_budget_consumed_pct": 0.049
+  },
+  "root_cause_analysis": {
+    "suspected_cause": "Service 'api' experiencing degradation indicated by alert APIHighErrorRate.",
+    "diagnostic_confidence": "LOW",
+    "five_whys": [
+      "Why 1: Service 'api' stopped responding to requests.",
+      "Why 2: Underlying pods failed health check or database connection.",
+      "Why 3: Dependency became unreachable or resource limits saturated.",
+      "Why 4: Fault injection or infrastructure degradation triggered failure.",
+      "Why 5: Self-healing required runbook intervention or replica restoration."
+    ]
+  },
+  "timeline": [
+    {
+      "timestamp": "2026-10-27T16:16:46.616127",
+      "relative_seconds": 0.0,
+      "event_type": "INCIDENT_TRIGGERED",
+      "summary": "Incident opened: API 5xx error rate exceeded 5%",
+      "actor": "SYSTEM",
+      "details": {
+        "service": "api",
+        "severity": "critical",
+        "source_alert": "APIHighErrorRate"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:46.617431",
+      "relative_seconds": 0.0,
+      "event_type": "ALERT_RECEIVED",
+      "summary": "Alertmanager fired alert APIHighErrorRate",
+      "actor": "ALERTMANAGER",
+      "details": {
+        "fingerprint": "fp-e2e-api-01",
+        "labels": {
+          "alertname": "APIHighErrorRate",
+          "severity": "critical",
+          "service": "api",
+          "namespace": "resiliencelab"
+        },
+        "annotations": {
+          "summary": "API 5xx error rate exceeded 5%",
+          "description": "5xx error rate is 28.5%"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:46.852048",
+      "relative_seconds": 0.2,
+      "event_type": "STATE_TRANSITION_INVESTIGATING",
+      "summary": "State transitioned from TRIGGERED to INVESTIGATING: Automated diagnosis completed: Service 'api' experiencing degradation indicated by alert APIHighErrorRate.",
+      "actor": "AUTO_DIAGNOSIS",
+      "details": {
+        "from_state": "TRIGGERED",
+        "to_state": "INVESTIGATING",
+        "reason": "Automated diagnosis completed: Service 'api' experiencing degradation indicated by alert APIHighErrorRate."
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:46.852694",
+      "relative_seconds": 0.2,
+      "event_type": "DIAGNOSIS_COMPLETED",
+      "summary": "Automated diagnosis (LOW confidence): Service 'api' experiencing degradation indicated by alert APIHighErrorRate.",
+      "actor": "AUTO_DIAGNOSIS",
+      "details": {
+        "suspected_cause": "Service 'api' experiencing degradation indicated by alert APIHighErrorRate.",
+        "confidence": "LOW",
+        "recommended_runbook": "api-unavailable",
+        "recommended_actions": [
+          {
+            "action_type": "verify_self_healing",
+            "target_resource": "deploy/api",
+            "risk_level": "LOW",
+            "requires_approval": false
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:46.861780",
+      "relative_seconds": 0.3,
+      "event_type": "STATE_TRANSITION_REMEDIATING",
+      "summary": "State transitioned from INVESTIGATING to REMEDIATING: Starting runbook-guided remediation",
+      "actor": "SRE_AUTOMATION",
+      "details": {
+        "from_state": "INVESTIGATING",
+        "to_state": "REMEDIATING",
+        "reason": "Starting runbook-guided remediation"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:46.886528",
+      "relative_seconds": 0.3,
+      "event_type": "REMEDIATION_DRY_RUN",
+      "summary": "Remediation step 1: [DRY-RUN SIMULATION] Would execute: verify_self_healing: wait 15s and check deploy/api status (risk=LOW, parameters={'wait_seconds': 15})",
+      "actor": "SRE_AUTOMATION",
+      "details": {
+        "remediation_id": "REM-E19BF4",
+        "action_type": "verify_self_healing",
+        "target_resource": "deploy/api",
+        "dry_run": true,
+        "success": true,
+        "output": "[DRY-RUN SIMULATION] Would execute: verify_self_healing: wait 15s and check deploy/api status (risk=LOW, parameters={'wait_seconds': 15})"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:46.890951",
+      "relative_seconds": 0.3,
+      "event_type": "REMEDIATION_DRY_RUN",
+      "summary": "Remediation step 2: [DRY-RUN SIMULATION] Would execute: kubectl rollout restart deploy/api -n resiliencelab (risk=LOW, parameters={})",
+      "actor": "SRE_AUTOMATION",
+      "details": {
+        "remediation_id": "REM-7FE566",
+        "action_type": "restart_deployment",
+        "target_resource": "deploy/api",
+        "dry_run": true,
+        "success": true,
+        "output": "[DRY-RUN SIMULATION] Would execute: kubectl rollout restart deploy/api -n resiliencelab (risk=LOW, parameters={})"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:46.894659",
+      "relative_seconds": 0.3,
+      "event_type": "REMEDIATION_DRY_RUN",
+      "summary": "Remediation step 3: [DRY-RUN SIMULATION] Would execute: kubectl scale deploy/api --replicas=2 -n resiliencelab (risk=MEDIUM, parameters={'replicas': 2})",
+      "actor": "SRE_AUTOMATION",
+      "details": {
+        "remediation_id": "REM-185032",
+        "action_type": "scale_deployment",
+        "target_resource": "deploy/api",
+        "dry_run": true,
+        "success": true,
+        "output": "[DRY-RUN SIMULATION] Would execute: kubectl scale deploy/api --replicas=2 -n resiliencelab (risk=MEDIUM, parameters={'replicas': 2})"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:46.907826",
+      "relative_seconds": 0.3,
+      "event_type": "STATE_TRANSITION_VERIFYING",
+      "summary": "State transitioned from REMEDIATING to VERIFYING: Starting automated recovery verification",
+      "actor": "VERIFICATION_ENGINE",
+      "details": {
+        "from_state": "REMEDIATING",
+        "to_state": "VERIFYING",
+        "reason": "Starting automated recovery verification"
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:52.967389",
+      "relative_seconds": 6.4,
+      "event_type": "STATE_TRANSITION_RESOLVED",
+      "summary": "State transitioned from VERIFYING to RESOLVED: Recovery verified: All recovery checks passed: K8s pods ready, consecutive probes succeeded, telemetry healthy.",
+      "actor": "VERIFICATION_ENGINE",
+      "details": {
+        "from_state": "VERIFYING",
+        "to_state": "RESOLVED",
+        "reason": "Recovery verified: All recovery checks passed: K8s pods ready, consecutive probes succeeded, telemetry healthy."
+      }
+    },
+    {
+      "timestamp": "2026-10-27T16:16:52.968265",
+      "relative_seconds": 6.4,
+      "event_type": "RECOVERY_VERIFIED",
+      "summary": "Incident resolved: All recovery checks passed: K8s pods ready, consecutive probes succeeded, telemetry healthy.",
+      "actor": "VERIFICATION_ENGINE",
+      "details": {
+        "consecutive_successes": 3,
+        "required_successes": 3,
+        "deployment_status": {
+          "healthy": true,
+          "desired": 2,
+          "ready": 2
+        },
+        "telemetry_status": {
+          "healthy": true
+        }
+      }
+    }
+  ],
+  "remediations": [
+    {
+      "id": "REM-E19BF4",
+      "incident_id": "INC-20261027-0903",
+      "runbook_id": "api-unavailable",
+      "action_type": "verify_self_healing",
+      "target_resource": "deploy/api",
+      "namespace": "resiliencelab",
+      "parameters": {
+        "wait_seconds": 15
+      },
+      "risk_level": "LOW",
+      "requires_approval": false,
+      "state": "COMPLETED",
+      "dry_run": true,
+      "execution_output": "[DRY-RUN SIMULATION] Would execute: verify_self_healing: wait 15s and check deploy/api status (risk=LOW, parameters={'wait_seconds': 15})",
+      "created_at": "2026-10-27T16:16:46.882405",
+      "executed_at": "2026-10-27T16:16:46.885321",
+      "approvals": []
+    },
+    {
+      "id": "REM-7FE566",
+      "incident_id": "INC-20261027-0903",
+      "runbook_id": "api-unavailable",
+      "action_type": "restart_deployment",
+      "target_resource": "deploy/api",
+      "namespace": "resiliencelab",
+      "parameters": {},
+      "risk_level": "LOW",
+      "requires_approval": false,
+      "state": "COMPLETED",
+      "dry_run": true,
+      "execution_output": "[DRY-RUN SIMULATION] Would execute: kubectl rollout restart deploy/api -n resiliencelab (risk=LOW, parameters={})",
+      "created_at": "2026-10-27T16:16:46.889627",
+      "executed_at": "2026-10-27T16:16:46.890389",
+      "approvals": []
+    },
+    {
+      "id": "REM-185032",
+      "incident_id": "INC-20261027-0903",
+      "runbook_id": "api-unavailable",
+      "action_type": "scale_deployment",
+      "target_resource": "deploy/api",
+      "namespace": "resiliencelab",
+      "parameters": {
+        "replicas": 2
+      },
+      "risk_level": "MEDIUM",
+      "requires_approval": false,
+      "state": "COMPLETED",
+      "dry_run": true,
+      "execution_output": "[DRY-RUN SIMULATION] Would execute: kubectl scale deploy/api --replicas=2 -n resiliencelab (risk=MEDIUM, parameters={'replicas': 2})",
+      "created_at": "2026-10-27T16:16:46.893281",
+      "executed_at": "2026-10-27T16:16:46.894121",
+      "approvals": []
+    }
+  ],
+  "preventive_actions": [
+    {
+      "action": "Introduce automated health watchdog for api",
+      "type": "Prevent",
+      "priority": "P1",
+      "owner": "SRE Platform Team"
+    },
+    {
+      "action": "Tune HPA scaling responsiveness and readiness probe thresholds",
+      "type": "Mitigate",
+      "priority": "P2",
+      "owner": "Cloud Infrastructure Team"
+    }
+  ]
+}

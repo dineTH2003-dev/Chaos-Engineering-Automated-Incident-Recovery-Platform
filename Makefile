@@ -134,13 +134,15 @@ ci-lint: ## Run Python flake8 and YAML manifest validation
 	@echo "=== Running Flake8 Linter ==="
 	./.venv/bin/flake8 application/ automation/
 	@echo "=== Validating YAML Manifests ==="
-	@./.venv/bin/python -c 'import os, yaml; [list(yaml.safe_load_all(open(os.path.join(r, f)))) for r, _, fs in os.walk(".") if not any(x in r for x in [".git", ".venv", "__pycache__"]) for f in fs if f.endswith((".yaml", ".yml"))]; print("YAML manifests syntax OK")'
+	@./.venv/bin/python -c 'import os, yaml; [list(yaml.safe_load_all(open(os.path.join(r, f)))) for r, _, fs in os.walk(".") if not any(x in r for x in [".git", ".venv", "__pycache__", "templates"]) for f in fs if f.endswith((".yaml", ".yml"))]; print("YAML manifests syntax OK")'
 
-ci-test: ## Run complete automated test suite (API + Incident Platform)
+ci-test: ## Run complete automated test suite (API + Incident Platform + Deployment Platform)
 	@echo "=== Running API Unit Tests ==="
 	PYTHONPATH=application/api ./.venv/bin/python -m pytest application/api/tests/ -v
 	@echo "=== Running Incident Platform Tests ==="
 	./.venv/bin/python -m pytest automation/incident/tests/ -v
+	@echo "=== Running Phase 5 Deployment Platform Tests ==="
+	./.venv/bin/python -m pytest automation/deployment/tests/ -v
 
 ci-validate-manifests: ## Dry-run validate Kubernetes manifests
 	kubectl apply --dry-run=client -f kubernetes/
@@ -172,8 +174,30 @@ gitops-reconcile: ## Force immediate Flux GitOps reconciliation
 	@echo "=== Reconciling Helm Release ==="
 	@flux reconcile helmrelease resiliencelab -n resiliencelab 2>/dev/null || kubectl get helmreleases -n resiliencelab
 
+deployment-status: ## Check current deployed image tags, GitOps sync state, and pod health
+	@echo "=== Current GitOps Image Tags ==="
+	@./.venv/bin/python -c 'from automation.deployment.gitops_updater import get_current_image_tags; print(get_current_image_tags())'
+	@echo "\n=== Flux HelmRelease Status ==="
+	@flux get helmreleases -n resiliencelab 2>/dev/null || kubectl get helmreleases -n resiliencelab
+	@echo "\n=== Application Pod Status ==="
+	@kubectl get pods -n resiliencelab -o wide
 
+deployment-verify: ## Run SRE Deployment Health Verification against active release
+	./.venv/bin/python -m automation.deployment.verifier --service api
 
+deployment-gate: ## Evaluate SRE-aware SLO release gate against live telemetry
+	./.venv/bin/python -m automation.deployment.release_gate
+
+deployment-history: ## View deployment history and audit trail log
+	@echo "=== ResilienceLab Deployment Audit Log ==="
+	@cat reports/deployments/deployments.log 2>/dev/null || echo "No deployment audit log found."
+
+deployment-rollback: ## Execute automated rollback to previous known-healthy revision
+	./.venv/bin/python -m automation.deployment.rollback --service api --deployment-id "MANUAL-ROLLBACK" --failed-tag "failed-release" --reason "Operator-initiated rollback"
+
+release-report: ## Display the latest deployment verification and gate reports
+	@echo "=== Latest Deployment Verification Reports ==="
+	@ls -t reports/deployments/verification_*.json 2>/dev/null | head -n 3 | xargs -n 1 jq . 2>/dev/null || ls -lh reports/deployments/ 2>/dev/null || echo "No reports found."
 obs-status: ## Check status of observability stack
 	@echo "=== Monitoring Pods ==="
 	@kubectl get pods -n monitoring

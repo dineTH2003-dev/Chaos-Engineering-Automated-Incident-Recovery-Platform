@@ -1,0 +1,40 @@
+{
+  "deployment_id": "SCENARIO-1-SUCCESS",
+  "service": "api",
+  "image_tag": "sha-abc1234",
+  "passed": true,
+  "start_time": "2026-10-27T16:17:00.129960+00:00",
+  "completion_time": "2026-10-27T16:17:00.130070+00:00",
+  "duration_seconds": 0.0,
+  "steps": [
+    {
+      "method_calls": [],
+      "passed": true,
+      "step_name": "rollout"
+    },
+    {
+      "method_calls": [],
+      "passed": true,
+      "step_name": "replicas"
+    },
+    {
+      "method_calls": [],
+      "passed": true,
+      "step_name": "probes"
+    },
+    {
+      "method_calls": [],
+      "passed": true,
+      "step_name": "telemetry",
+      "details": {
+        "error_rate_pct": 0.0,
+        "p95_latency_ms": 25.0
+      }
+    }
+  ],
+  "failure_reason": null,
+  "telemetry_snapshot": {
+    "error_rate_pct": 0.0,
+    "p95_latency_ms": 25.0
+  }
+}

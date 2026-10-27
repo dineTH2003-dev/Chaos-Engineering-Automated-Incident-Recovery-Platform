@@ -1,0 +1,21 @@
+{
+  "deployment_id": "SCENARIO-4-SLO-REGRESSION",
+  "decision": "ABORT",
+  "passed": false,
+  "reasons": [
+    "Tail latency p95 (750.0ms) breached objective (500.0ms)"
+  ],
+  "metrics": {
+    "active_critical_incidents": [],
+    "request_rate_rps": 12.0,
+    "sufficient_traffic": true,
+    "availability_pct": 99.8,
+    "availability_target_pct": 99.5,
+    "p95_latency_ms": 750.0,
+    "latency_target_ms": 500.0,
+    "burn_rate_1h": 0.4
+  },
+  "active_incidents": [],
+  "evaluated_at": "2026-10-27T16:17:00.140113+00:00",
+  "can_override": true
+}

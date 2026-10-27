@@ -7,9 +7,9 @@
     "namespace": "resiliencelab",
     "status": "RESOLVED",
     "source_alert": "APIHighErrorRate",
-    "started_at": "2026-10-27T14:20:18.513370",
-    "resolved_at": "2026-10-27T14:21:18.513370",
-    "generated_at": "2026-10-27T14:21:18.546781+00:00"
+    "started_at": "2026-10-27T16:15:46.581900",
+    "resolved_at": "2026-10-27T16:16:46.581900",
+    "generated_at": "2026-10-27T16:16:46.597572+00:00"
   },
   "durations": {
     "ttd_seconds": 0.0,
