@@ -1,0 +1,34 @@
+# Chaos Mesh Helm values tailored for ResilienceLab on Minikube
+# Container Runtime: Docker (docker://29.2.1)
+# Optimization: Single controller replica, disabled dashboard & DNS chaos to conserve RAM
+
+timezone: "UTC"
+
+controllerManager:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      cpu: 200m
+      memory: 192Mi
+
+chaosDaemon:
+  runtime: docker
+  socketPath: /var/run/docker.sock
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+# Disable UI dashboard to conserve ~60MiB memory in local Minikube
+dashboard:
+  create: false
+
+# Disable DNS chaos server as experiments focus on Pod, Network, and Stress chaos
+dnsServer:
+  create: false

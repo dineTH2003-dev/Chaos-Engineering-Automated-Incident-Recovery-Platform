@@ -1,0 +1,27 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: ce03-postgres-partition
+  namespace: resiliencelab
+  labels:
+    app.kubernetes.io/part-of: resiliencelab
+    experiment-id: CE-03
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces:
+      - resiliencelab
+    labelSelectors:
+      app: postgres
+      chaos-enabled: "true"
+  direction: both
+  target:
+    mode: all
+    selector:
+      namespaces:
+        - resiliencelab
+      labelSelectors:
+        app: resiliencelab-api
+        chaos-enabled: "true"
+  duration: "45s"

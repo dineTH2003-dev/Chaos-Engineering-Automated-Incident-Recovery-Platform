@@ -1,0 +1,52 @@
+{
+  "experiment_id": "CE-04",
+  "experiment_name": "API CPU Saturation & Scaling",
+  "hypothesis": "85% CPU load on 1 replica elevates telemetry; unaffected replica absorbs excess load; system stabilizes within 15s post-stress.",
+  "execution": {
+    "start_time": "2026-10-27T13:31:40.148826+00:00",
+    "end_time": "2026-10-27T13:32:46.469339+00:00",
+    "duration_seconds": 66.32
+  },
+  "sre_metrics": {
+    "mttd_seconds": 2.33,
+    "mttr_seconds": 62.98,
+    "availability_pct": 100.0,
+    "slo_target_availability_pct": 98.0,
+    "slo_met": true,
+    "verdict": "PASS"
+  },
+  "probing_summary": {
+    "total_probes": 110,
+    "successful_probes": 110,
+    "degraded_probes": 0,
+    "failed_probes": 0,
+    "availability_pct": 100.0,
+    "p50_latency_ms": 99.45,
+    "p95_latency_ms": 153.87,
+    "p99_latency_ms": 194.85
+  },
+  "baseline": {
+    "p95_latency_ms": 23.67,
+    "error_rate_pct": 0.0,
+    "ready_replicas": 2,
+    "cpu_cores": 0.0,
+    "availability_pct": 100.0
+  },
+  "chaos_telemetry": {
+    "probes_sent": 110,
+    "degraded_probes": 0,
+    "failed_probes": 0
+  },
+  "recovery_telemetry": {
+    "p95_latency_ms": 90.63,
+    "error_rate_pct": 0.0,
+    "ready_replicas": 2,
+    "cpu_cores": 0.0,
+    "availability_pct": 100.0
+  },
+  "alerts_observed": [],
+  "notes": [
+    "Applied manifest: chaos/experiments/ce04-cpu-stress.yaml",
+    "Deleted manifest: chaos/experiments/ce04-cpu-stress.yaml"
+  ]
+}

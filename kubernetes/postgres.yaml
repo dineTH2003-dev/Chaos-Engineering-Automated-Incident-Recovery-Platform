@@ -33,6 +33,7 @@ spec:
     metadata:
       labels:
         app: postgres
+        chaos-enabled: "true"
     spec:
       containers:
         - name: postgres

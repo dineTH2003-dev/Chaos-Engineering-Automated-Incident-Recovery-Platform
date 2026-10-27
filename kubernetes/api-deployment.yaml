@@ -19,6 +19,7 @@ spec:
     metadata:
       labels:
         app: resiliencelab-api
+        chaos-enabled: "true"
     spec:
       terminationGracePeriodSeconds: 30
       containers:

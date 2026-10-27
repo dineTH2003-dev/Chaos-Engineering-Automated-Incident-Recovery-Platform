@@ -155,6 +155,50 @@ obs-port-forward-webhook: ## Port-forward Webhook Receiver to localhost:5001
 obs-incidents: ## View recorded incidents from webhook receiver
 	@kubectl exec -n $(NAMESPACE) deploy/webhook-receiver -- cat /reports/incidents/incidents.log 2>/dev/null || cat reports/incidents/incidents.log
 
+# ─── Chaos Engineering ──────────────────────────────────────────
+
+chaos-install: ## Install Chaos Mesh v2.8.6 with Minikube optimizations
+	./chaos/installation/install.sh
+
+chaos-verify-install: ## Verify Chaos Mesh installation and CRDs
+	./chaos/installation/verify-installation.sh
+
+chaos-status: ## List active chaos experiments and controller status
+	@echo "=== Chaos Mesh Pods ==="
+	@kubectl get pods -n chaos-mesh
+	@echo "\n=== Active Fault Injections in $(NAMESPACE) ==="
+	@kubectl get podchaos,networkchaos,stresschaos -n $(NAMESPACE)
+
+chaos-ce01: ## Run CE-01: API Pod Failure & Self-Healing
+	./chaos/scripts/run_experiment.sh ce01
+
+chaos-ce02: ## Run CE-02: API-to-Database Network Latency
+	./chaos/scripts/run_experiment.sh ce02
+
+chaos-ce03: ## Run CE-03: PostgreSQL Dependency Outage & Recovery
+	./chaos/scripts/run_experiment.sh ce03
+
+chaos-ce04: ## Run CE-04: API CPU Saturation & Scaling
+	./chaos/scripts/run_experiment.sh ce04
+
+chaos-all: ## Run full automated chaos test suite (CE-01 to CE-04)
+	./chaos/scripts/run_experiment.sh all
+
+chaos-load-test: ## Run continuous k6 background load test for chaos experiments
+	$(K6_BIN) run load-testing/chaos-test.js
+
+chaos-verify-recovery: ## Verify cluster steady-state and health
+	./chaos/scripts/verify_recovery.sh
+
+chaos-abort: ## Emergency abort: kill all active chaos experiments immediately
+	./chaos/scripts/cleanup_experiment.sh
+
+chaos-reports: ## List all generated experiment and incident reports
+	@echo "=== JSON Experiment Reports ==="
+	@ls -lh reports/experiments/
+	@echo "\n=== Markdown Incident Reports ==="
+	@ls -lh reports/incidents/
+
 # ─── Clean ─────────────────────────────────────────────────────
 
 clean: ## Full cleanup — stop cluster, remove compose volumes

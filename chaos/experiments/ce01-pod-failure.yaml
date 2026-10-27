@@ -1,0 +1,18 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: ce01-api-pod-failure
+  namespace: resiliencelab
+  labels:
+    app.kubernetes.io/part-of: resiliencelab
+    experiment-id: CE-01
+spec:
+  action: pod-kill
+  mode: one
+  gracePeriod: 0
+  selector:
+    namespaces:
+      - resiliencelab
+    labelSelectors:
+      app: resiliencelab-api
+      chaos-enabled: "true"

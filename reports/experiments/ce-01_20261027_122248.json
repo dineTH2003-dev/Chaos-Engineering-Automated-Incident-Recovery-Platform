@@ -1,0 +1,52 @@
+{
+  "experiment_id": "CE-01",
+  "experiment_name": "API Pod Failure & Self-Healing",
+  "hypothesis": "Surviving API replica serves uninterrupted traffic (100% availability); Kubernetes replaces killed pod in <15s.",
+  "execution": {
+    "start_time": "2026-10-27T12:22:17.673789+00:00",
+    "end_time": "2026-10-27T12:22:45.951052+00:00",
+    "duration_seconds": 28.28
+  },
+  "sre_metrics": {
+    "mttd_seconds": 1.13,
+    "mttr_seconds": 26.83,
+    "availability_pct": 100.0,
+    "slo_target_availability_pct": 99.5,
+    "slo_met": true,
+    "verdict": "PASS"
+  },
+  "probing_summary": {
+    "total_probes": 52,
+    "successful_probes": 52,
+    "degraded_probes": 0,
+    "failed_probes": 0,
+    "availability_pct": 100.0,
+    "p50_latency_ms": 43.75,
+    "p95_latency_ms": 73.9,
+    "p99_latency_ms": 83.73
+  },
+  "baseline": {
+    "p95_latency_ms": 21.91,
+    "error_rate_pct": 0.0,
+    "ready_replicas": 2,
+    "cpu_cores": 0.0,
+    "availability_pct": 100.0
+  },
+  "chaos_telemetry": {
+    "probes_sent": 52,
+    "degraded_probes": 0,
+    "failed_probes": 0
+  },
+  "recovery_telemetry": {
+    "p95_latency_ms": 22.43,
+    "error_rate_pct": 0.0,
+    "ready_replicas": 2,
+    "cpu_cores": 0.0,
+    "availability_pct": 100.0
+  },
+  "alerts_observed": [],
+  "notes": [
+    "Applied manifest: chaos/experiments/ce01-pod-failure.yaml",
+    "Deleted manifest: chaos/experiments/ce01-pod-failure.yaml"
+  ]
+}

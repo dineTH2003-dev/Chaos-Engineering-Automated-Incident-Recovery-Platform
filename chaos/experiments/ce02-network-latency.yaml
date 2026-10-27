@@ -1,0 +1,31 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: ce02-api-db-latency
+  namespace: resiliencelab
+  labels:
+    app.kubernetes.io/part-of: resiliencelab
+    experiment-id: CE-02
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - resiliencelab
+    labelSelectors:
+      app: resiliencelab-api
+      chaos-enabled: "true"
+  delay:
+    latency: "300ms"
+    jitter: "50ms"
+    correlation: "25"
+  direction: to
+  target:
+    mode: all
+    selector:
+      namespaces:
+        - resiliencelab
+      labelSelectors:
+        app: postgres
+        chaos-enabled: "true"
+  duration: "60s"

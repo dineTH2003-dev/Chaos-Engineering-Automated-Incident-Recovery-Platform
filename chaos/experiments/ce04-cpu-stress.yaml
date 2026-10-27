@@ -1,0 +1,21 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: ce04-api-cpu-stress
+  namespace: resiliencelab
+  labels:
+    app.kubernetes.io/part-of: resiliencelab
+    experiment-id: CE-04
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - resiliencelab
+    labelSelectors:
+      app: resiliencelab-api
+      chaos-enabled: "true"
+  stressors:
+    cpu:
+      workers: 1
+      load: 85
+  duration: "60s"

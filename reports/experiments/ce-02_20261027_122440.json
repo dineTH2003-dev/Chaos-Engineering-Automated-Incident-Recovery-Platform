@@ -1,0 +1,52 @@
+{
+  "experiment_id": "CE-02",
+  "experiment_name": "API-to-Database Network Latency",
+  "hypothesis": "300ms network delay elevates API p95 latency; requests succeed without dropped connections; recovery is instantaneous upon expiration.",
+  "execution": {
+    "start_time": "2026-10-27T12:23:20.420920+00:00",
+    "end_time": "2026-10-27T12:24:38.163607+00:00",
+    "duration_seconds": 77.74
+  },
+  "sre_metrics": {
+    "mttd_seconds": 15.39,
+    "mttr_seconds": 61.87,
+    "availability_pct": 100.0,
+    "slo_target_availability_pct": 99.0,
+    "slo_met": true,
+    "verdict": "PASS"
+  },
+  "probing_summary": {
+    "total_probes": 133,
+    "successful_probes": 133,
+    "degraded_probes": 0,
+    "failed_probes": 0,
+    "availability_pct": 100.0,
+    "p50_latency_ms": 63.07,
+    "p95_latency_ms": 232.23,
+    "p99_latency_ms": 295.07
+  },
+  "baseline": {
+    "p95_latency_ms": 22.68,
+    "error_rate_pct": 0.0,
+    "ready_replicas": 2,
+    "cpu_cores": 0.0,
+    "availability_pct": 100.0
+  },
+  "chaos_telemetry": {
+    "probes_sent": 133,
+    "degraded_probes": 0,
+    "failed_probes": 0
+  },
+  "recovery_telemetry": {
+    "p95_latency_ms": 246.14,
+    "error_rate_pct": 0.0,
+    "ready_replicas": 2,
+    "cpu_cores": 0.0,
+    "availability_pct": 100.0
+  },
+  "alerts_observed": [],
+  "notes": [
+    "Applied manifest: chaos/experiments/ce02-network-latency.yaml",
+    "Deleted manifest: chaos/experiments/ce02-network-latency.yaml"
+  ]
+}

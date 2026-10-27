@@ -1,0 +1,95 @@
+{
+  "experiment_id": "CE-03",
+  "experiment_name": "PostgreSQL Dependency Outage & Recovery",
+  "hypothesis": "API readiness probe decouples and fails gracefully (503); liveness stays 200; reconnection is automatic upon DB restoration; 0 data loss.",
+  "execution": {
+    "start_time": "2026-10-27T12:26:39.696648+00:00",
+    "end_time": "2026-10-27T12:27:24.887236+00:00",
+    "duration_seconds": 45.19
+  },
+  "sre_metrics": {
+    "mttd_seconds": 0.81,
+    "mttr_seconds": 43.85,
+    "availability_pct": 27.78,
+    "slo_target_availability_pct": 20.0,
+    "slo_met": true,
+    "verdict": "PASS"
+  },
+  "probing_summary": {
+    "total_probes": 36,
+    "successful_probes": 10,
+    "degraded_probes": 26,
+    "failed_probes": 0,
+    "availability_pct": 27.78,
+    "p50_latency_ms": 58.35,
+    "p95_latency_ms": 3395.53,
+    "p99_latency_ms": 5741.03
+  },
+  "baseline": {
+    "p95_latency_ms": 3750.0,
+    "error_rate_pct": 0.0,
+    "ready_replicas": 2,
+    "cpu_cores": 0.0,
+    "availability_pct": 100.0
+  },
+  "chaos_telemetry": {
+    "probes_sent": 36,
+    "degraded_probes": 26,
+    "failed_probes": 0
+  },
+  "recovery_telemetry": {
+    "p95_latency_ms": 2119.65,
+    "error_rate_pct": 0.0,
+    "ready_replicas": 0,
+    "cpu_cores": 0.0,
+    "availability_pct": 100.0
+  },
+  "alerts_observed": [
+    {
+      "alertname": "KubeDeploymentReplicasMismatch",
+      "alertstate": "pending",
+      "severity": "warning",
+      "pod": "kube-prometheus-stack-kube-state-metrics-77d47584b6-2b5c4"
+    },
+    {
+      "alertname": "ApiReplicasUnavailable",
+      "alertstate": "pending",
+      "severity": "critical",
+      "pod": "kube-prometheus-stack-kube-state-metrics-77d47584b6-2b5c4"
+    },
+    {
+      "alertname": "DatabaseConnectionFailures",
+      "alertstate": "firing",
+      "severity": "critical",
+      "pod": "api-9599847c5-mtfq7"
+    },
+    {
+      "alertname": "KubePodNotReady",
+      "alertstate": "pending",
+      "severity": "warning",
+      "pod": "api-9599847c5-z6nsw"
+    },
+    {
+      "alertname": "WorkerProcessingFailures",
+      "alertstate": "firing",
+      "severity": "critical",
+      "pod": "worker-7bdff4bb45-77rd6"
+    },
+    {
+      "alertname": "DatabaseConnectionFailures",
+      "alertstate": "firing",
+      "severity": "critical",
+      "pod": "api-9599847c5-z6nsw"
+    },
+    {
+      "alertname": "KubePodNotReady",
+      "alertstate": "pending",
+      "severity": "warning",
+      "pod": "api-9599847c5-mtfq7"
+    }
+  ],
+  "notes": [
+    "Scaled deployment/postgres to 0 replicas.",
+    "Restored deployment/postgres to 1 replica."
+  ]
+}
